@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5001
 app.use(express.json())
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:5173','https://lms-client.onrender.com']
+    origin: ['http://localhost:5173','https://lms-client.onrender.com','https://exellence.space']
 }))
 app.use('/', router)
 
