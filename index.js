@@ -18,8 +18,6 @@ app.use('/', router)
 app.use(fileUpload({
     createParentPath: true
 }))
-
-app.use(express.static(__dirname + '/src/bookImg'))
 app.use(errorHandlingMiddleware)
 
 function start(){

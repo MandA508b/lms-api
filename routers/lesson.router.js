@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 router.post('/create', upload.single('video'), lessonController.create)
+router.post('/createFullLesson', upload.single('video'), lessonController.createFullLesson)
 router.get('/findAll', lessonController.findAllByCourse)
 router.get('/findById', lessonController.findById)
 router.delete('/delete', lessonController.delete)
