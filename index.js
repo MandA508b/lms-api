@@ -2,6 +2,8 @@ require('dotenv').config()
 const express = require('express');
 const cors = require('cors')
 const router = require('./routers/index')
+const fileUpload = require('express-fileupload')
+const errorHandlingMiddleware = require('./middlewares/error_handling.middleware')
 
 const app = express();
 const PORT = process.env.PORT || 5001
@@ -9,9 +11,16 @@ const PORT = process.env.PORT || 5001
 app.use(express.json())
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:5173','https://lms-client.onrender.com','https://exellence.space']
+    origin: ['http://localhost:3000']
 }))
+app.use(express.static(__dirname + '/src/videos'));
 app.use('/', router)
+app.use(fileUpload({
+    createParentPath: true
+}))
+
+app.use(express.static(__dirname + '/src/bookImg'))
+app.use(errorHandlingMiddleware)
 
 function start(){
     app.listen(PORT, ()=>{
