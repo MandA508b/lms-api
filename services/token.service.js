@@ -1,79 +1,107 @@
-const jwt = require('jsonwebtoken')
-const Token = require('../models/token.model')
+const User = require('../models/user.model')
+const bcrypt = require('bcrypt')
+const ApiError = require(`../errors/api.error`)
+const tokenService = require('../services/token.service')
+const UserDto = require('../dtos/user.dto')
 
-class tokenService{
-    generateTokens(payload){
+class userService{
+    async findAll() {
         try{
-            const accessToken = jwt.sign(payload, process.env.SECRET_ACCESS_KEY, {expiresIn: '60m'})
-            const refreshToken = jwt.sign(payload, process.env.SECRET_REFRESH_KEY, {expiresIn: '7d'})
+            return await User.find()
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+    async delete(email) {
+        try{
+            return await User.findOneAndDelete({email})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
 
-            return{
-                accessToken,
-                refreshToken
+    async registration(email, password, role){
+        try{
+            const candidate = await User.findOne({email})
+            if(candidate){
+                throw ApiError.preconditionFailed('Корситувач з таким email вже зареєстрований!')
             }
+            const hashPassword = await bcrypt.hash(password, 3)
+            const time = new Date().toISOString()
+            const user = await User.create({email, password: hashPassword, time, role})
+
+            const userDto = new UserDto(user)
+            const tokens = await tokenService.generateTokens({...userDto})
+            await tokenService.saveToken(userDto.id, userDto.role, userDto.email, tokens.refreshToken)
+
+            return ({...tokens, user: user})
         }catch (e) {
             console.log("error: ", e)
         }
     }
 
-    validateAccessToken(token){
+    async login(email, password){
         try{
-            const userData = jwt.verify(token, process.env.SECRET_ACCESS_KEY)
-
-            return userData
-        }catch (e) {
-            console.log("error: ", e)
-            return null
-        }
-    }
-
-    validateRefreshToken(token){
-        try{
-            const userData = jwt.verify(token, process.env.SECRET_REFRESH_KEY)
-
-            return userData
-        }catch (e) {
-            console.log("error: ", e)
-            return null
-        }
-    }
-
-    async saveToken(userId, role, login, refreshToken){
-        try{
-            const tokenData = await Token.findOne({userId})
-            if(tokenData){
-                tokenData.refreshToken = refreshToken
-                await tokenData.save()
-
-                return tokenData
+            const user = await User.findOne({email})
+            if(user === undefined){
+                return await this.registration(email, password)
+                throw ApiError.notFound('Користувача з таким email не знайдено!')
             }
-            const token = await Token.create({userId, role, login, refreshToken})
+            let comparePassword = await bcrypt.compare(password, user.password)
+            if(!comparePassword){
+                throw ApiError.badRequest('Невірний пароль!')
+            }
+            const userDto = new UserDto(user)
+            const tokens = await tokenService.generateTokens({...userDto})
+            await tokenService.saveToken(userDto.id, userDto.role, tokens.refreshToken)
 
+
+            return ({...tokens, user: user})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async refresh(refreshToken){
+        try{
+            const userData = await tokenService.validateRefreshToken(refreshToken)
+            const tokenFromDb = await tokenService.findToken(refreshToken)
+            if(tokenFromDb === undefined || userData === undefined){
+                throw ApiError.unauthorized("Користувач не авторизований!")
+            }
+            const id = userData.id
+            const user = await User.findOne({id})
+            const userDto = new UserDto(user)
+            const tokens = await tokenService.generateTokens({...userDto})
+            await tokenService.saveToken(userDto.id, userDto.role, tokens.refreshToken)
+
+            return ({accessToken: tokens.accessToken, user: user})
+        }catch (e) {
+            console.log("error: ",e)
+        }
+    }
+
+    async logout(refreshToken){
+        try{
+            const token = await tokenService.removeToken(refreshToken)
             return token
         }catch (e) {
-            console.log("error: ", e)
+            console.log("error: ")
         }
     }
 
-    async removeToken(refreshToken){
-        try{
-            const tokenData = await Token.findOneAndDelete({refreshToken})
+    async findById(userId){
+        try {
+            const user = await User.findById(userId)
+            if(user === undefined){
+                throw ApiError.badRequest('Користувача не знайдено!')
+            }
 
-            return tokenData
-        }catch (e) {
-            console.log("error: ", e)
-        }
-    }
-
-    async findToken(refreshToken){
-        try{
-            const tokenData = await Token.findOne({refreshToken})
-
-            return tokenData
+            return user
         }catch (e) {
             console.log("error: ", e)
         }
     }
 
 }
-module.exports = new tokenService()
+module.exports = new userService()

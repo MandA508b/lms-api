@@ -1,6 +1,6 @@
 const User = require('../models/user.model')
 const bcrypt = require('bcrypt')
-// const ApiError = require(`../errors/api.error`)
+const ApiError = require(`../errors/api.error`)
 const tokenService = require('../services/token.service')
 const UserDto = require('../dtos/user.dto')
 
@@ -12,27 +12,27 @@ class userService{
             console.log("error: ", e)
         }
     }
-    async delete(login) {
+    async delete(email) {
         try{
-            return await User.findOneAndDelete({login})
+            return await User.findOneAndDelete({email})
         }catch (e) {
             console.log("error: ", e)
         }
     }
 
-    async registration(login, password, role){
+    async registration(email, password, role){
         try{
-            const candidate = await User.findOne({login})
+            const candidate = await User.findOne({email})
             if(candidate){
-                // throw ApiError.preconditionFailed('Корситувач з таким login вже зареєстрований!')
+                throw ApiError.preconditionFailed('Корситувач з таким email вже зареєстрований!')
             }
             const hashPassword = await bcrypt.hash(password, 3)
             const time = new Date().toISOString()
-            const user = await User.create({login, password: hashPassword, time, role})
+            const user = await User.create({email, password: hashPassword, time, role})
 
             const userDto = new UserDto(user)
             const tokens = await tokenService.generateTokens({...userDto})
-            await tokenService.saveToken(userDto.id, userDto.role, userDto.login, tokens.refreshToken)
+            await tokenService.saveToken(userDto.id, userDto.role, userDto.email, tokens.refreshToken)
 
             return ({...tokens, user: user})
         }catch (e) {
@@ -40,12 +40,12 @@ class userService{
         }
     }
 
-    async login(login, password){
+    async login(email, password){
         try{
-            const user = await User.findOne({login})
+            const user = await User.findOne({email})
             if(user === undefined){
-                return await this.registration(login, password)
-                // throw ApiError.notFound('Користувача з таким login не знайдено!')
+                return await this.registration(email, password)
+                throw ApiError.notFound('Користувача з таким email не знайдено!')
             }
             let comparePassword = await bcrypt.compare(password, user.password)
             if(!comparePassword){
@@ -67,7 +67,7 @@ class userService{
             const userData = await tokenService.validateRefreshToken(refreshToken)
             const tokenFromDb = await tokenService.findToken(refreshToken)
             if(tokenFromDb === undefined || userData === undefined){
-                // throw ApiError.unauthorized("Користувач не авторизований!")
+                throw ApiError.unauthorized("Користувач не авторизований!")
             }
             const id = userData.id
             const user = await User.findOne({id})
@@ -94,30 +94,10 @@ class userService{
         try {
             const user = await User.findById(userId)
             if(user === undefined){
-                // throw ApiError.badRequest('Користувача не знайдено!')
+                throw ApiError.badRequest('Користувача не знайдено!')
             }
 
             return user
-        }catch (e) {
-            console.log("error: ", e)
-        }
-    }
-
-    async registrationByService(serviceId, login, username, picture){
-        try{
-            const candidate = await User.findOne({serviceId})
-            if(candidate){
-                // throw ApiError.preconditionFailed('Корситувач з таким serviceId вже зареєстрований!')
-            }
-            const time = new Date().toISOString()
-            const user = await User.create({serviceId, login, username, picture, time})
-
-            const userDto = new UserDto(user)
-            const tokens = await tokenService.generateTokens({...userDto})
-            await tokenService.saveToken(userDto.id, userDto.role, tokens.refreshToken)
-
-
-            return ({...tokens, user: user})
         }catch (e) {
             console.log("error: ", e)
         }

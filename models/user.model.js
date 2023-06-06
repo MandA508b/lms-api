@@ -1,7 +1,7 @@
 const db = require('../db/index')
 
 const schema = new db.Schema({
-    login:{
+    email:{
         type: String,
         required: true,
         trim: true,
@@ -11,6 +11,14 @@ const schema = new db.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    email_verified_at: {
+        type: Boolean,
+        default: false
+    },
+    usdt_wallet: {
+        type: String,
+        trim: true//todo: is it necessary?
     },
     role: {
         type: String,
