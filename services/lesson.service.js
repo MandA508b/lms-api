@@ -5,6 +5,19 @@ const ApiError = require(`../errors/api.error`)
 
 class lessonService{
 
+    async createFullLesson(data, video){
+        try{
+            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename})
+            for(let i = 0; i < data.questions.length; i++){
+                const question = await lessonQuestionService.createFullQuestion(lesson._id, data.questions[i])
+            }
+
+            return lesson
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
     async create(course_id, name, description, video) {
         try{
             const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename})
