@@ -7,6 +7,7 @@ class lessonController{
         try{
             const {data_} =req.body
             const data = JSON.parse(data_)
+            console.log(req.body)
             console.log({data})
             const video = req.file
 
