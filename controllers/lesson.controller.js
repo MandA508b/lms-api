@@ -5,14 +5,11 @@ class lessonController{
 
     async createFullLesson(req, res, next){
         try{
-            const {data_} =req.body
+            const {data_} = req.body
             const data = JSON.parse(data_)
-            console.log(req.body)
-            console.log({data})
             const video = req.file
 
             if(!data.course_id || !data.name || !data.description || !data.questions || !video){
-                console.log({data})
                 return next(ApiError.badRequest())
             }
             const full_lesson = await lessonService.createFullLesson(data, video)

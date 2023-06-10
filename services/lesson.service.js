@@ -11,7 +11,8 @@ class lessonService{
         try{
             let created_at = await timeService.getDate(1);
             created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd;
-            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video, created_at})
+            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at})
+
             for(let i = 0; i < data.questions.length; i++){
                 const question = await lessonQuestionService.createFullQuestion(lesson._id, data.questions[i])
             }
