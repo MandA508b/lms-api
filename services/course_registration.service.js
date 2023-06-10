@@ -21,7 +21,7 @@ class courseRegistrationService{
             const course_iteration = await Course_iteration.findOne({start_at})
 
             if(course_iteration === null){
-                throw ApiError.notFound('Юзера не знайдено!')
+                throw ApiError.notFound('Ітерацію не знайдено!')
             }
 
             const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iteration._id})
