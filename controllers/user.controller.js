@@ -43,10 +43,14 @@ class userController{
     async login(req, res, next){
         try {
             const {email, password} = req.body
+            console.log(email, password)
             if(email === undefined || password === undefined){
                 return next(ApiError.badRequest('Не введено логін або пароль!'))
             }
             const userData = await userService.login(email, password)
+            if(userData===undefined){
+                return next(ApiError.notFound())
+            }
             res.cookie('refreshToken', userData.refreshToken, {maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true})
 
             return res.json({accessToken: userData.accessToken, user: userData.user})

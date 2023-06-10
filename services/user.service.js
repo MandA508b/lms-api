@@ -43,8 +43,8 @@ class userService{
     async login(email, password){
         try{
             const user = await User.findOne({email})
-            if(user === undefined){
-                return await this.registration(email, password)
+            console.log({user})
+            if(user === null){
                 throw ApiError.notFound('Користувача з таким email не знайдено!')
             }
             let comparePassword = await bcrypt.compare(password, user.password)
