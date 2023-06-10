@@ -20,6 +20,10 @@ const schema = new db.Schema({
     video_name: {
         type: String,
         required: true
+    },
+    created_at: {
+        type: String,
+        required: true
     }
 })
 

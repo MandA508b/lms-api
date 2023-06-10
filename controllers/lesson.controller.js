@@ -83,13 +83,27 @@ class lessonController{
         }
     }
 
+    async findActualLesson(req, res, next){
+        try{
+            const {course_id,course_iteration_id, user_id} = req.query
+            if(!course_id || !course_iteration_id || !user_id){
+                return next(ApiError.badRequest())
+            }
+            const lesson = await lessonService.findActualLesson(course_id, course_iteration_id, user_id)
+
+            return res.json(lesson)
+        }catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new lessonController()
 
 /*
 
-// EXAMPLE TO CREATE FULLL ESSON \\
+// EXAMPLE TO CREATE FULL LESSON \\
 
 {
     "data": {
