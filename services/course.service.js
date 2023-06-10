@@ -20,6 +20,7 @@ class courseService{
             console.log("error: ", e)
         }
     }
+
     async delete(course_id) {
         try{
             const course = await Course.findByIdAndDelete(course_id)
