@@ -11,7 +11,7 @@ class courseRegistrationService{
         try{
             const user = await User.findById(user_id)//checking for the relevance of the user
 
-            if(user === undefined){
+            if(user === null){
                 throw ApiError.notFound('Юзера не знайдено!')
             }//checked!
 
