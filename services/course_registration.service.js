@@ -20,7 +20,7 @@ class courseRegistrationService{
 
             const course_iteration = await Course_iteration.findOne({start_at})
 
-            if(course_iteration === undefined){
+            if(course_iteration === null){
                 throw ApiError.notFound('Юзера не знайдено!')
             }
 
