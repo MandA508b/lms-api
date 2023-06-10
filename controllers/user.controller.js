@@ -33,6 +33,9 @@ class userController{
                 return next(ApiError.badRequest("Не введено логін або пароль!"))
             }
             const userData = await userService.registration(email, password, role)
+            if(userData===undefined){
+                return next(ApiError.notFound())
+            }
             res.cookie('refreshToken', userData.refreshToken, {maxAge: 7 * 24 * 60 * 60 * 1000, httpOnly: true})
 
             return res.json(userData)

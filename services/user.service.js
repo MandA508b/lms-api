@@ -23,13 +23,14 @@ class userService{
     async registration(email, password, role){
         try{
             const candidate = await User.findOne({email})
+            console.log({candidate})
             if(candidate){
                 throw ApiError.preconditionFailed('Корситувач з таким email вже зареєстрований!')
             }
             const hashPassword = await bcrypt.hash(password, 3)
             const time = new Date().toISOString()
             const user = await User.create({email, password: hashPassword, time, role})
-
+            console.log({user}            )
             const userDto = new UserDto(user)
             const tokens = await tokenService.generateTokens({...userDto})
             await tokenService.saveToken(userDto.id, userDto.role, userDto.email, tokens.refreshToken)
