@@ -4,7 +4,7 @@ const userAnswerService = require('../services/user_answer.service')
 class userAnswerController{
     async create(req,res,next){
         try{
-            const {user_id, course_iteration_id, lesson_id, question_id, is_correct} = req.body
+            const {user_id, course_iteration_id, lesson_id, question_id, is_correct} = req.body//todo: 123456 + findall
 
             if(!user_id || !course_iteration_id || !lesson_id || !question_id ||  is_correct===undefined){
                 return next(ApiError.badRequest())
