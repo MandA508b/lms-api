@@ -16,7 +16,7 @@ class courseRegistrationService{
             }//checked!
 
             let start_at = await timeService.getDate(2);
-            start_at = start_at.yyyy + '.' + start_at.mm + '.' + start_at.dd;
+            start_at = start_at.yyyy + '.' + start_at.mm + '.' + start_at.dd;//todo: 1234
 
             const course_iteration = await Course_iteration.findOne({start_at})
 

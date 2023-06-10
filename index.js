@@ -28,7 +28,6 @@ function start(){
 }
 
 start();
-<<<<<<< HEAD
 
 let CronJob = require('cron').CronJob,
     job = new CronJob(// cron options + func
@@ -40,5 +39,4 @@ let CronJob = require('cron').CronJob,
         null,
         true
     )
-=======
->>>>>>> ef8e1d00be1ea5bb39afee65181b7f8b02e8f6d9
+
