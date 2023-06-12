@@ -90,11 +90,11 @@ class userController{
 
     async findById(req, res, next){
         try{
-            const {userId} = req.query
-            if(userId === undefined){
+            const {user_id} = req.query
+            if(user_id === undefined){
                 return next(ApiError.badRequest())
             }
-            const user = await userService.findById(userId)
+            const user = await userService.findById(user_id)
 
             return res.json(user)
         }catch (e) {
