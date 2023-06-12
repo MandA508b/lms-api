@@ -91,9 +91,9 @@ class userService{
         }
     }
 
-    async findById(userId){
+    async findById(user_id){
         try {
-            const user = await User.findById(userId)
+            const user = await User.findById(user_id)
             if(user === undefined){
                 throw ApiError.badRequest('Користувача не знайдено!')
             }

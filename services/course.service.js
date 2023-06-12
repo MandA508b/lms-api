@@ -62,7 +62,7 @@ class courseService{
         try {
             const course = await Course.findById(course_id)
             if(course === undefined){
-                throw ApiError.badRequest('Користувача не знайдено!')
+                throw ApiError.badRequest('Курс не знайдено!')
             }
 
             return course
