@@ -1,13 +1,16 @@
 const Course = require('../models/course.model')
 const Lesson = require('../models/lesson.model')
 const lessonService = require('./lesson.service')
+const courseIterationService = require('../services/course_iteration.service')
 const ApiError = require(`../errors/api.error`)
 
 class courseService{
 
     async create(user_id, name, description) {
         try{
-            return await Course.create({user_id, name, description})
+            const course = await Course.create({user_id, name, description})
+
+            return {course}
         }catch (e) {
             console.log("error: ", e)
         }
@@ -49,6 +52,24 @@ class courseService{
             console.log("error: ", e)
         }
     }
+
+    async publishCourse(course_id){
+        try {
+            const course = await Course.findById(course_id)
+            if(course===null || course.is_published===true){
+                throw ApiError.notFound('Курс не знайдено!')
+            }
+            course.is_published=true
+            await course.save()
+
+            const course_registration = await courseIterationService.create(course._id)
+
+            return course
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
 
 }
 module.exports = new courseService()

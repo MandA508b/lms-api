@@ -13,8 +13,6 @@ class courseIterationService{
             let finish_at = await timeService.getDate(3);
             finish_at = finish_at.yyyy + '.' + finish_at.mm + '.' + finish_at.dd;
 
-            console.log(start_at, ' ', finish_at)
-
             const courses = await Course.findAll()
             for (let key in courses) {
                 const course_iteration = await this.create(courses[key]._id, start_at, finish_at)
@@ -26,8 +24,14 @@ class courseIterationService{
         }
     }
 
-    async create(course_id, start_at, finish_at) {
+    async create(course_id) {
         try{
+            let start_at = await timeService.getDate(2);
+            start_at = start_at.yyyy + '.' + start_at.mm + '.' + "01";
+
+            let finish_at = await timeService.getDate(3);
+            finish_at = finish_at.yyyy + '.' + finish_at.mm + '.' + "01";
+
             return await Course_iteration.create({course_id, start_at, finish_at})
         }catch (e) {
             console.log("error: ", e)
