@@ -8,7 +8,7 @@ class lessonController{
             const {data_} = req.body
             const data = JSON.parse(data_)
             const video = req.file
-
+            console.log(data, data.course_id)
             if(!data.course_id || !data.name || !data.description || !data.questions || !video){
                 return next(ApiError.badRequest())
             }
@@ -101,43 +101,42 @@ module.exports = new lessonController()
 
 /*
 
-// EXAMPLE TO CREATE FULL LESSON \\
+// EXAMPLE data_ TO CREATE FULL LESSON \\
 
-{
-    "data": {
-    "course_id": "647fb8a62720fac4a6669f81",
-    "name": "test_lesson",
-    "description": "test",
-    "questions": [
-        {
-            "name": "test_question_1",
-            "time_show": "10000",
-            "answers":[
-                {
-                    "name": "test_answer_1_1",
-                    "right_answer": true
-                },
-                {
-                    "name": "test_answer_1_2",
-                    "right_answer": false
-                }
-            ]
-        },
-        {
-            "name": "test_question_2",
-            "time_show": "20000",
-            "answers":[
-                {
-                    "name": "test_answer_2_1",
-                    "right_answer": true
-                },
-                {
-                    "name": "test_answer_2_2",
-                    "right_answer": true
-                }
-            ]
-        }
-    ]
-}
-}
+    {
+        "course_id": "647fb8a62720fac4a6669f81",
+        "name": "test_lesson",
+        "description": "test",
+        "questions": [
+            {
+                "name": "test_question_1",
+                "time_show": "10000",
+                "answers":[
+                    {
+                        "name": "test_answer_1_1",
+                        "right_answer": true
+                    },
+                    {
+                        "name": "test_answer_1_2",
+                        "right_answer": false
+                    }
+                ]
+            },
+            {
+                "name": "test_question_2",
+                "time_show": "20000",
+                "answers":[
+                    {
+                        "name": "test_answer_2_1",
+                        "right_answer": true
+                    },
+                    {
+                        "name": "test_answer_2_2",
+                        "right_answer": true
+                    }
+                ]
+            }
+        ]
+    }
+
  */

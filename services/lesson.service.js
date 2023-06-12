@@ -3,12 +3,15 @@ const Lesson_question = require('../models/lesson_question.model')
 const lessonQuestionService = require('./lesson_question.service')
 const UserAnswer = require('../models/user_answer.model')
 const timeService = require('./time.service')
+const courseIterationService = require('./course_iteration.service')
 const ApiError = require(`../errors/api.error`)
 
 class lessonService{
 
     async createFullLesson(data, video){
         try{
+            console.log(video)
+
             let created_at = await timeService.getDate(1);
             created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd;
             const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at})
@@ -25,8 +28,10 @@ class lessonService{
 
     async create(course_id, name, description, video) {
         try{
-            const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename})
 
+            let created_at = await timeService.getDate(1);//todo: add numbering
+            created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd;
+            const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at})
             return lesson
         }catch (e) {
             console.log("error: ", e)
@@ -75,6 +80,11 @@ class lessonService{
             let point = userAnswers.length
             if(userAnswers.length > 0 && userAnswers[userAnswers.length - 1].is_correct === false){
                 point -= 1
+            }
+            let date = await timeService.getDate(1);
+            date = date.yyyy + '.' + date.mm + '.' + date.dd;
+            if(userAnswers[userAnswers.length - 1].created_at===date){
+                return null//todo: return something else?
             }
 
             const lesson = await this.findAllByCourse(course_id)
