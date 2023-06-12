@@ -5,6 +5,10 @@ const schema = new db.Schema({
         type: db.Schema.Types.ObjectId,
         required: true
     },
+    participants: {
+        type: Number,
+        default: 0
+    },
     start_at: {
         type: String,
         required: true
