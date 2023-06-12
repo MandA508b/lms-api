@@ -55,6 +55,20 @@ class courseController{
         }
     }
 
+    async publishCourse(req ,res, next) {
+        try {
+            const {course_id} = req.body
+            if (!course_id) {
+                return next(ApiError.badRequest())
+            }
+            const course = await courseService.publishCourse(course_id)
+
+            return res.json(course)
+        } catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new courseController()

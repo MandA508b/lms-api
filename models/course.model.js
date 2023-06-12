@@ -16,6 +16,10 @@ const schema = new db.Schema({
     visibility: {
         type: Boolean,
         default: true
+    },
+    is_published: {
+       type: Boolean,
+       default: false
     }
 })
 

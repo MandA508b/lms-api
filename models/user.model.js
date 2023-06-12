@@ -18,7 +18,7 @@ const schema = new db.Schema({
     },
     usdt_wallet: {
         type: String,
-        trim: true//todo: is it necessary?
+        trim: true
     },
     role: {
         type: String,
