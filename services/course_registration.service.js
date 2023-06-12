@@ -25,6 +25,8 @@ class courseRegistrationService{
             }
 
             const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iteration._id})
+            course_iteration.participants = course_iteration.participants + 1
+            await course_iteration.save()
 
             return course_registration
         }catch (e) {
