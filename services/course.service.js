@@ -16,9 +16,27 @@ class courseService{
         }
     }
 
-    async findAll() {
+    async findAll(user_id) {
         try{
-            return await Course.find()
+            const courses = await Course.find({is_published: true})
+            if(!user_id){
+                return courses
+            }
+            let courses_list = []
+            for (let key in courses) {
+                const course_iteration = courseIterationService.findByUser(user_id)
+                if(course_iteration===null){
+                    courses_list.push({course: courses[key], registered: false})
+                    continue;
+                }
+                const course_iteration_id = course_iteration._id
+
+                const actualLesson = await lessonService.findActualLesson(courses[key]._id, course_iteration_id, user_id)
+
+                courses_list.push({course: courses[key], actualLesson, registered: true})
+            }
+
+            return courses_list
         }catch (e) {
             console.log("error: ", e)
         }
