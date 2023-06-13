@@ -1,20 +1,20 @@
 const Lesson = require('../models/lesson.model')
+const LessonRating = require('../models/lesson_rating.model')
 const Lesson_question = require('../models/lesson_question.model')
 const lessonQuestionService = require('./lesson_question.service')
 const UserAnswer = require('../models/user_answer.model')
 const timeService = require('./time.service')
-const courseIterationService = require('./course_iteration.service')
 const ApiError = require(`../errors/api.error`)
 
 class lessonService{
 
     async createFullLesson(data, video){
         try{
-            console.log(video)
 
             let created_at = await timeService.getDate(1);
-            created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd;
+            created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd + '.' + created_at.h + '.' + created_at.m + '.' + created_at.s;
             const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at})
+            const lesson_rating = await LessonRating.create({lesson_id: lesson._id, course_id: data.course_id})
 
             for(let i = 0; i < data.questions.length; i++){
                 const question = await lessonQuestionService.createFullQuestion(lesson._id, data.questions[i])
@@ -40,11 +40,28 @@ class lessonService{
 
     async findAllByCourse(course_id) {
         try{
-            return await Lesson.find({course_id})
+            return await Lesson.find({course_id}).sort({created_at: 1})
         }catch (e) {
             console.log("error: ", e)
         }
     }
+
+    async findAllByCourseAuthor(course_id) {
+        try{
+            const lessons = await Lesson.find({course_id}).sort({created_at: 1})
+            let lessons_list = []
+
+            for(let key in lessons){
+                const lessons_rating = await LessonRating.findOne({lesson_id: lessons[key]._id})
+                lessons_list.push({lesson: lessons[key], rating: {rating: lessons_rating.rating, votes: lessons_rating.votes}})
+            }
+
+            return lessons_list
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
     async delete(lesson_id) {
         try{
             const lesson = await Lesson.findByIdAndDelete(lesson_id)
@@ -76,9 +93,11 @@ class lessonService{
 
         async findActualLesson(course_id, course_iteration_id, user_id){
         try {
-            const userAnswers = await UserAnswer.find({course_iteration_id, user_id}).sort({created_at: -1})//todo: -1?
+            const lesson = await this.findAllByCourse(course_id)
+            const userAnswers = await UserAnswer.find({course_iteration_id, user_id}).sort({created_at: 1})//todo: -1?
             let point = userAnswers.length
-            if(userAnswers.length > 0 && userAnswers[userAnswers.length - 1].is_correct === false){
+            if(userAnswers.length===0)return lesson[0]
+            if(userAnswers[userAnswers.length - 1].is_correct === false){
                 point -= 1
             }
             let date = await timeService.getDate(1);
@@ -86,9 +105,6 @@ class lessonService{
             if(userAnswers[userAnswers.length - 1].created_at===date){
                 return null//todo: return something else?
             }
-
-            const lesson = await this.findAllByCourse(course_id)
-
             if(lesson.length <= point){
                 throw ApiError.badRequest('Всі уроки пройдено!')
             }

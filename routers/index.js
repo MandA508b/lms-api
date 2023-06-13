@@ -8,6 +8,7 @@ const courseRegistrationRouter = require('./course_registration.router')
 const lessonRouter = require('./lesson.router')
 const lessonAnswerRouter = require('./lesson_answer.router')
 const lessonQuestionRouter = require('./lesson_question.router')
+const ratingRouter = require('./rating.router')
 
 router.use('/user', userRouter)
 router.use('/userAnswer', userAnswerRouter)
@@ -17,5 +18,6 @@ router.use('/courseRegistration', courseRegistrationRouter)
 router.use('/lesson', lessonRouter)
 router.use('/lessonAnswer', lessonAnswerRouter)
 router.use('/lessonQuestion', lessonQuestionRouter)
+router.use('/rating', ratingRouter)
 
 module.exports = router

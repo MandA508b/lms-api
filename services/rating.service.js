@@ -5,15 +5,15 @@ const ApiError = require('../errors/api.error')
 
 class timeService{
 
-    async createLessonRating(user_id, item_id, course_id, type, rating){
+    async createLessonRating(user_id, lesson_id, rating){
         try{
-            const lesson_rating = await LessonRating.findById(item_id)
-            const course_rating = await LessonRating.findById(course_id)
+            const lesson_rating = await LessonRating.findById(lesson_id)
+            const course_rating = await CourseRating.findById(lesson_rating.course_id)
 
             if(lesson_rating===null || course_rating===null){
                 throw ApiError.badRequest()
             }
-            const created_rating = await Rating.create({user_id, item_id, course_id, type, rating})
+            const created_rating = await Rating.create({user_id, lesson_id, rating})
             lesson_rating.rating = (lesson_rating.rating * lesson_rating.votes + rating) / (lesson_rating.votes + 1)
             lesson_rating.votes = lesson_rating.votes + 1
             await lesson_rating.save()

@@ -8,7 +8,6 @@ class courseRegistrationController{
             const {course_id, user_id} = req.body
 
             const video = req.file
-            console.log({video})
 
             if(!course_id || !user_id) {
                 return next(ApiError.badRequest())

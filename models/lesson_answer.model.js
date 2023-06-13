@@ -1,7 +1,7 @@
 const db= require('../db/index')
 
 const schema = new db.Schema({
-    lesson_id: {
+    lesson_question_id: {
         type: db.Schema.Types.ObjectId,
         required: true
     },

@@ -16,7 +16,7 @@ class courseRegistrationService{
             }//checked!
 
             let start_at = await timeService.getDate(2);
-            start_at = start_at.yyyy + '.' + start_at.mm + '.' + "01";//todo: 1234
+            start_at = start_at.yyyy + '.' + start_at.mm + '.' + "01";
 
             const course_iteration = await Course_iteration.findOne({start_at})
 
@@ -57,6 +57,22 @@ class courseRegistrationService{
             }
 
             return user_course_registrations
+        }catch (e) {
+            console.log("error ", e)
+        }
+    }
+
+    async actualRegistration(user_id, course_iteration, course_id){
+        try{
+            let date = await timeService.getDate(1);
+            date = date.yyyy + '.' + date.mm + '.' + date.dd;
+            const course_registration = await Course_registration.find({user_id, course_id, course_iteration_id: course_iteration._id})
+
+            if(course_iteration.start_at <= date && course_iteration.finish_at > date){
+                return course_registration
+            }
+
+            return null
         }catch (e) {
             console.log("error ", e)
         }
