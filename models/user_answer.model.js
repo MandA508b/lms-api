@@ -13,10 +13,6 @@ const schema = new db.Schema({
         type: db.Schema.Types.ObjectId,
         required: true
     },
-    question_id: {
-        type: db.Schema.Types.ObjectId,
-        required: true
-    },
     attempt: {
         type: Number,
         default: 1

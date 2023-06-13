@@ -28,6 +28,20 @@ class courseController{
         }
     }
 
+    async findByAuthor(req,res,next){
+        try{
+            const {author_id} = req.query
+            if(!author_id){
+                return next(ApiError.badRequest())
+            }
+            const courses = await courseService.findByAuthor(author_id)
+
+            return res.json(courses)
+        }catch (e) {
+            next(e)
+        }
+    }
+
     async delete(req, res, next) {
         try {
             const {course_id} = req.body

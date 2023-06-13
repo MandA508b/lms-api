@@ -20,7 +20,14 @@ class userAnswerService{
                 throw ApiError.notFound()
             }
 
-            const candidate = await User_answer.findOne({user_id, course_iteration_id, lesson_id})
+            let in_time = false
+
+            const user_answers = await User_answer.find({user_id, course_iteration_id}).sort({created_at: -1})
+            if(user_answers.length===0 || (user_answers.length>0 && data.dd-user_answers[0].created_at.slice(user_answers[0].created_at.length-2)===1)){
+                in_time = true
+            }
+
+            const candidate = await User_answer.findOne({user_id, course_iteration_id, in_time, lesson_id})
             if(candidate){
                 candidate.is_correct = is_correct
                 candidate.attempt = candidate.attempt + 1
@@ -28,7 +35,7 @@ class userAnswerService{
                 return candidate
             }
 
-            return await User_answer.create({user_id, course_iteration_id, lesson_id, is_correct})
+            return await User_answer.create({user_id, course_iteration_id, lesson_id, in_time, is_correct, created_at: full_data})
         }catch (e) {
             console.log("error: ", e)
         }

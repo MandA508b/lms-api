@@ -1,11 +1,7 @@
 const db= require('../db/index')
 
 const schema = new db.Schema({
-    user_id:{
-        type: db.Schema.Types.ObjectId,
-        required: true
-    },
-    lesson_id: {
+    lesson_id:{
         type: db.Schema.Types.ObjectId,
         required: true
     },
@@ -23,4 +19,4 @@ const schema = new db.Schema({
     }
 })
 
-module.exports = db.model('Course_rating', schema)
+module.exports = db.model('Lesson_rating', schema)

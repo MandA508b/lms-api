@@ -8,7 +8,6 @@ class lessonController{
             const {data_} = req.body
             const data = JSON.parse(data_)
             const video = req.file
-            console.log(data, data.course_id)
             if(!data.course_id || !data.name || !data.description || !data.questions || !video){
                 return next(ApiError.badRequest())
             }
@@ -25,7 +24,6 @@ class lessonController{
             const {course_id, name, description} = req.body
 
             const video = req.file
-            console.log({video})
 
             if(course_id===undefined || name===undefined || description===undefined || video === undefined) {
                 return next(ApiError.badRequest())
@@ -104,7 +102,7 @@ module.exports = new lessonController()
 // EXAMPLE data_ TO CREATE FULL LESSON \\
 
     {
-        "course_id": "647fb8a62720fac4a6669f81",
+        "course_id": "64879ff3be578ab207620a54",
         "name": "test_lesson",
         "description": "test",
         "questions": [
