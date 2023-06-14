@@ -13,6 +13,10 @@ const schema = new db.Schema({
         type: String,
         required: true
     },
+    lessons: {
+       type: Number,
+       default: 0
+    },
     visibility: {
         type: Boolean,
         default: true
