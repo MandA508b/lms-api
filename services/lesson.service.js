@@ -1,8 +1,9 @@
 const Lesson = require('../models/lesson.model')
 const LessonRating = require('../models/lesson_rating.model')
 const Lesson_question = require('../models/lesson_question.model')
-const lessonQuestionService = require('./lesson_question.service')
 const UserAnswer = require('../models/user_answer.model')
+const Course = require('../models/course.model')
+const lessonQuestionService = require('./lesson_question.service')
 const timeService = require('./time.service')
 const ApiError = require(`../errors/api.error`)
 
@@ -15,6 +16,9 @@ class lessonService{
             created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd + '.' + created_at.h + '.' + created_at.m + '.' + created_at.s;
             const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at})
             const lesson_rating = await LessonRating.create({lesson_id: lesson._id, course_id: data.course_id})
+            const course = await Course.findById(data.course_id)
+            course.lessons = course.lessons + 1
+            await course.save()
 
             for(let i = 0; i < data.questions.length; i++){
                 const question = await lessonQuestionService.createFullQuestion(lesson._id, data.questions[i])
@@ -29,6 +33,9 @@ class lessonService{
     async create(course_id, name, description, video) {
         try{
 
+            const course = await Course.findById(course_id)
+            course.lessons = course.lessons + 1
+            await course.save()
             let created_at = await timeService.getDate(1);//todo: add numbering
             created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd;
             const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at})
