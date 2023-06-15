@@ -4,7 +4,7 @@ const fs = require('fs')
 
 router.get('/:id', function(req, res) {
     const videoId = req.params.id;
-    const path = `video/${videoId}`;
+    const path = `../src/videos/${videoId}`;
 
     // Перевірка наявності файлу перед подальшою обробкою
     fs.access(path, fs.constants.F_OK, (err) => {
