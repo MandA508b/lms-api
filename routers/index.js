@@ -9,6 +9,7 @@ const lessonRouter = require('./lesson.router')
 const lessonAnswerRouter = require('./lesson_answer.router')
 const lessonQuestionRouter = require('./lesson_question.router')
 const ratingRouter = require('./rating.router')
+const videoRouter = require('./video.router')
 
 router.use('/user', userRouter)
 router.use('/userAnswer', userAnswerRouter)
@@ -19,5 +20,6 @@ router.use('/lesson', lessonRouter)
 router.use('/lessonAnswer', lessonAnswerRouter)
 router.use('/lessonQuestion', lessonQuestionRouter)
 router.use('/rating', ratingRouter)
+router.use('/video', videoRouter)
 
 module.exports = router
