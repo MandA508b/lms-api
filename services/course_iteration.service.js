@@ -76,7 +76,7 @@ class courseIterationService{
         try{
             const course_iteration = await Course_iteration.find({course_id}).sort({start_at: -1})
             if(course_iteration.length === 1){
-                return course_iteration[0]
+                return null
             }
 
             return course_iteration[course_iteration[course_iteration.length - 1]]
