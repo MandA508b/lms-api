@@ -33,13 +33,27 @@ class courseIterationController{
 
     async findByUser(req, res, next){
         try{
-            const {user_id} =req.body
+            const {user_id} =req.query
             if(!user_id){
                 return next(ApiError.badRequest())
             }
             const course_iterations = await courseIterationService.findByUser(user_id)
 
             return res.json(course_iterations)
+        }catch (e) {
+            next(e)
+        }
+    }
+
+    async actualIteration(req, res, next){
+        try{
+                const {course_id} =req.query
+            if(!course_id){
+                return next(ApiError.badRequest())
+            }
+            const course_iteration = await courseIterationService.actualIteration(course_id)
+
+            return res.json(course_iteration)
         }catch (e) {
             next(e)
         }
