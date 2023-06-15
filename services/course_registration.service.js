@@ -62,19 +62,27 @@ class courseRegistrationService{
         }
     }
 
-    async actualRegistration(user_id, course_iteration, course_id){
+    async actualRegistration(user_id, course_iteration, course_id){//todo: переробити
         try{
             let date = await timeService.getDate(1);
             date = date.yyyy + '.' + date.mm + '.' + date.dd;
-            const course_registration = await Course_registration.find({user_id, course_id, course_iteration_id: course_iteration._id})
+            const course_registration = await Course_registration.findOne({user_id, course_id, course_iteration_id: course_iteration._id})
 
-            if(course_iteration.start_at <= date && course_iteration.finish_at > date){
+            if(course_registration!==null && course_iteration.start_at <= date && course_iteration.finish_at > date){
                 return course_registration
             }
 
             return null
         }catch (e) {
             console.log("error ", e)
+        }
+    }
+
+    async checkRegistration(user_id, course_id){
+        try{
+            const course_registrations = await Course_registration.find({user_id, course_id})
+        }catch (e) {
+            console.log("error: ", e)
         }
     }
 
