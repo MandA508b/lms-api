@@ -29,14 +29,14 @@ class courseService{
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
                 const data = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
-                if(data===null){
-                    courses_list.push({course: courses[key], registered: false, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}})
+                if(data===false){
+                    courses_list.push({course: courses[key], registered: false, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration_id: course_iteration._id})
                     continue;
                 }
 
                 const actualLesson = await lessonService.findActualLesson(courses[key]._id, course_iteration._id, user_id)
 
-                courses_list.push({course: courses[key], actualLesson, registered: true, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}})
+                courses_list.push({course: courses[key], actualLesson, registered: true, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration_id: course_iteration._id})
             }
 
             return courses_list

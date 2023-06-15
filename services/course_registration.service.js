@@ -78,13 +78,5 @@ class courseRegistrationService{
         }
     }
 
-    async checkRegistration(user_id, course_id){
-        try{
-            const course_registrations = await Course_registration.find({user_id, course_id})
-        }catch (e) {
-            console.log("error: ", e)
-        }
-    }
-
 }
 module.exports = new courseRegistrationService()
