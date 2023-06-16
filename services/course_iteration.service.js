@@ -26,12 +26,16 @@ class courseIterationService{
 
     async create(course_id) {
         try{
+            let prev_start = await timeService.getDate(1);
+            prev_start = prev_start.yyyy + '.' + prev_start.mm + '.' + "01";
+
             let start_at = await timeService.getDate(2);
             start_at = start_at.yyyy + '.' + start_at.mm + '.' + "01";
 
             let finish_at = await timeService.getDate(3);
             finish_at = finish_at.yyyy + '.' + finish_at.mm + '.' + "01";
 
+            const course_iteration = await Course_iteration.create({course_id, start_at: prev_start , finish_at: start_at})
             return await Course_iteration.create({course_id, start_at, finish_at})
         }catch (e) {
             console.log("error: ", e)
@@ -74,12 +78,9 @@ class courseIterationService{
 
     async actualIteration(course_id){
         try{
+            console.log({course_id})
             const course_iteration = await Course_iteration.find({course_id}).sort({start_at: -1})
-            if(course_iteration.length === 1){
-                return course_iteration[0]
-            }
-
-            return course_iteration[course_iteration[course_iteration.length - 1]]
+            return course_iteration[course_iteration.length - 1]
         }catch (e) {
             console.log("error: ", e)
         }

@@ -7,8 +7,8 @@ class timeService{
 
     async createLessonRating(user_id, lesson_id, rating){
         try{
-            const lesson_rating = await LessonRating.findById(lesson_id)
-            const course_rating = await CourseRating.findById(lesson_rating.course_id)
+            const lesson_rating = await LessonRating.findOne({lesson_id})
+            const course_rating = await CourseRating.findOne({course_id: lesson_rating.course_id})
 
             if(lesson_rating===null || course_rating===null){
                 throw ApiError.badRequest()
