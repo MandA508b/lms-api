@@ -14,7 +14,7 @@ class lessonService{
 
             let created_at = await timeService.getDate(1);
             created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd + '.' + created_at.h + '.' + created_at.m + '.' + created_at.s;
-            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at})
+            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at, video_duration: data.duration})
             const lesson_rating = await LessonRating.create({lesson_id: lesson._id, course_id: data.course_id})
             const course = await Course.findById(data.course_id)
             course.lessons = course.lessons + 1
@@ -30,7 +30,7 @@ class lessonService{
         }
     }
 
-    async create(course_id, name, description, video) {
+    async create(course_id, name, description, video, duration) {
         try{
 
             const course = await Course.findById(course_id)
@@ -38,7 +38,7 @@ class lessonService{
             await course.save()
             let created_at = await timeService.getDate(1);//todo: add numbering
             created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd;
-            const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at})
+            const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at, video_duration: duration})
             return lesson
         }catch (e) {
             console.log("error: ", e)
@@ -133,3 +133,5 @@ class lessonService{
 
 }
 module.exports = new lessonService()
+
+

@@ -80,11 +80,12 @@ class courseService{
     async findById(course_id){
         try {
             const course = await Course.findById(course_id)
-            if(course === undefined){
-                throw ApiError.badRequest('Курс не знайдено!')
-            }
+            const courseRating = await CourseRating.findOne({course_id: course_id})
+            const course_iteration = await courseIterationService.actualIteration(course_id)
 
-            return course
+            const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration._id)
+
+            return {course, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id}
         }catch (e) {
             console.log("error: ", e)
         }
