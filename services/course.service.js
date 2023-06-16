@@ -21,9 +21,6 @@ class courseService{
     async findAll(user_id) {
         try{
             const courses = await Course.find({is_published: true})
-            // if(!user_id){
-            //     return courses
-            // }
             let courses_list = []
             for (let key in courses) {
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})

@@ -13,7 +13,7 @@ class timeService{
             if(lesson_rating===null || course_rating===null){
                 throw ApiError.badRequest()
             }
-            const created_rating = await Rating.create({user_id, lesson_id, rating})
+            const created_rating = await Rating.create({user_id, item_id: lesson_id, rating})
             lesson_rating.rating = (lesson_rating.rating * lesson_rating.votes + rating) / (lesson_rating.votes + 1)
             lesson_rating.votes = lesson_rating.votes + 1
             await lesson_rating.save()
