@@ -102,7 +102,7 @@ module.exports = new lessonController()
 // EXAMPLE data_ TO CREATE FULL LESSON \\
 
     {
-        "course_id": "64879ff3be578ab207620a54",
+        "course_id": "648b44e0a8a3d7475fc0723e",
         "name": "test_lesson",
         "description": "test",
         "questions": [
