@@ -16,7 +16,6 @@ class timeService{
                 yyyy += Math.floor(mm/12)
                 mm -= Math.floor(mm/12)*12
             }
-
             return {ms, s, m, h, dd, mm, yyyy}
         }catch (e) {
             console.log("error: ", e)
