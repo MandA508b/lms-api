@@ -21,15 +21,15 @@ class courseService{
     async findAll(user_id) {
         try{
             const courses = await Course.find({is_published: true})
-            if(!user_id){
-                return courses
-            }
+            // if(!user_id){
+            //     return courses
+            // }
             let courses_list = []
             for (let key in courses) {
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
-                const data = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
-                if(data===false){
+                const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
+                if(actual_registration===null){
                     courses_list.push({course: courses[key], registered: false, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration_id: course_iteration._id})
                     continue;
                 }
