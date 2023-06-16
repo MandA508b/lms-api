@@ -53,14 +53,15 @@ class lessonService{
         }
     }
 
-    async findAllByCourseAuthor(course_id) {
+    async findAllByCourseAuthor(course_id, course_iteration_id) {
         try{
             const lessons = await Lesson.find({course_id}).sort({created_at: 1})
             let lessons_list = []
 
             for(let key in lessons){
                 const lessons_rating = await LessonRating.findOne({lesson_id: lessons[key]._id})
-                lessons_list.push({lesson: lessons[key], rating: {rating: lessons_rating.rating, votes: lessons_rating.votes}})
+                const passed = await UserAnswer.find({course_iteration_id, lesson_id: lessons[key]._id, is_correct: true})
+                lessons_list.push({lesson: lessons[key], rating: {rating: lessons_rating.rating, votes: lessons_rating.votes}, passed: passed.length})
             }
 
             return lessons_list
