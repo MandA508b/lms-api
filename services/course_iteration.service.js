@@ -78,8 +78,10 @@ class courseIterationService{
 
     async actualIteration(course_id){
         try{
-            const course_iteration = await Course_iteration.find({course_id}).sort({start_at: -1})
-            return course_iteration[course_iteration.length - 1]
+            let date = await timeService.getDate(1)
+            date = date.yyyy + '.' + date.mm + '.01';
+            const course_iteration = await Course_iteration.findOne({course_id, start_at: date})
+            return course_iteration
         }catch (e) {
             console.log("error: ", e)
         }

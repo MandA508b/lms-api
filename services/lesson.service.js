@@ -103,23 +103,28 @@ class lessonService{
             const lesson = await this.findAllByCourse(course_id)
             const userAnswers = await UserAnswer.find({course_iteration_id, user_id}).sort({created_at: 1})//todo: -1?
             let point = userAnswers.length
+            const tillFinish = lesson.length - point
 
+            let date = await timeService.getDate(1);
+
+            const missedDays = Math.max(date.dd - userAnswers[userAnswers.length - 1].created_at.slice(8) - 1, 0)
+
+            date = date.yyyy + '.' + date.mm + '.' + date.dd;
             if(lesson.length <= point){
-                throw ApiError.badRequest('Всі уроки пройдено!')
+                return {lesson: null, missedDays, tillFinish}
             }
 
             if(userAnswers.length===0)return lesson[0]
             if(userAnswers[userAnswers.length - 1].is_correct === false){
                 point -= 1
             }
-            let date = await timeService.getDate(1);
-            date = date.yyyy + '.' + date.mm + '.' + date.dd;
+
+
             if(userAnswers[userAnswers.length - 1].created_at===date){
-                return null//todo: return something else?
+                return {lesson: null, missedDays, tillFinish}
             }
 
-
-            return lesson[point]
+            return {lesson: lesson[point], missedDays, tillFinish}
         }catch (e) {
             console.log("error: ", e)
         }
