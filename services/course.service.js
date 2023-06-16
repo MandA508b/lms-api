@@ -52,7 +52,7 @@ class courseService{
 
                 const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id)
 
-                courses_list.push({course: courses[key], participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons})
+                courses_list.push({course: courses[key], participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id})
             }
 
             return courses_list

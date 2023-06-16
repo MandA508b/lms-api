@@ -78,7 +78,6 @@ class courseIterationService{
 
     async actualIteration(course_id){
         try{
-            console.log({course_id})
             const course_iteration = await Course_iteration.find({course_id}).sort({start_at: -1})
             return course_iteration[course_iteration.length - 1]
         }catch (e) {
