@@ -85,9 +85,9 @@ class courseService{
             const courseRating = await CourseRating.findOne({course_id: course_id})
             const course_iteration = await courseIterationService.actualIteration(course_id)
 
-            const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration._id)
+            const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration.course_iteration._id)
 
-            return {course, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id}
+            return {course, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id, participants: course_iteration.course_iteration.participants}
         }catch (e) {
             console.log("error: ", e)
         }
