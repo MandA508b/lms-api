@@ -79,9 +79,12 @@ class courseIterationService{
     async actualIteration(course_id){
         try{
             let date = await timeService.getDate(1)
+            let date2 = await timeService.getDate(2)
             date = date.yyyy + '.' + date.mm + '.01';
+            date2 = date2.yyyy + '.' + date2.mm + '.01';
             const course_iteration = await Course_iteration.findOne({course_id, start_at: date})
-            return course_iteration
+            const next_course_iteration = await Course_iteration.findOne({course_id, start_at: date2})
+            return {course_iteration, next_course_iteration}
         }catch (e) {
             console.log("error: ", e)
         }

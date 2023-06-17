@@ -26,14 +26,16 @@ class courseService{
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
                 const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
-                if(actual_registration===null){
-                    courses_list.push({course: courses[key], registered: false, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration_id: course_iteration._id})
+                if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
+                    courses_list.push({course: courses[key], registered: false, participants: course_iteration.course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration_id: course_iteration._id})
                     continue;
                 }
+                let actualLesson = null
+                if(actual_registration.course_registration!==null) {
+                    actualLesson = await lessonService.findActualLesson(courses[key]._id, course_iteration.course_iteration._id, user_id)
+                }
 
-                const actualLesson = await lessonService.findActualLesson(courses[key]._id, course_iteration._id, user_id)
-
-                courses_list.push({course: courses[key], actualLesson, registered: true, participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration_id: course_iteration._id})
+                courses_list.push({course: courses[key], actualLesson, registered: true, participants: course_iteration.course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration_id: course_iteration._id})
             }
 
             return courses_list
@@ -50,9 +52,9 @@ class courseService{
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
 
-                const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration._id)
+                const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration.course_iteration._id)
 
-                courses_list.push({course: courses[key], participants: course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id})
+                courses_list.push({course: courses[key], participants: course_iteration.course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id})
             }
 
             return courses_list
