@@ -18,7 +18,7 @@ class courseRegistrationService{
             let start_at = await timeService.getDate(2);
             start_at = start_at.yyyy + '.' + start_at.mm + '.' + "01";
 
-            const course_iteration = await Course_iteration.findOne({start_at})
+            const course_iteration = await Course_iteration.findOne({course_id, start_at})
 
             if(course_iteration === null){
                 throw ApiError.notFound('Ітерацію не знайдено!')
@@ -64,7 +64,13 @@ class courseRegistrationService{
 
     async actualRegistration(user_id, course_iteration, course_id){
         try{
-            return await Course_registration.findOne({user_id, course_id, course_iteration_id: course_iteration._id})
+            let course_registration = null, next_course_registration = null
+            if(course_iteration.course_iteration){
+                course_registration = await Course_registration.findOne({user_id, course_id, course_iteration_id: course_iteration.course_iteration._id})
+            }
+            if(course_iteration.next_course_iteration){
+                next_course_registration = await Course_registration.findOne({user_id, course_id, course_iteration_id: course_iteration.next_course_iteration._id})
+            }
         }catch (e) {
             console.log("error ", e)
         }
