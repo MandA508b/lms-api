@@ -71,6 +71,7 @@ class courseRegistrationService{
             if(course_iteration.next_course_iteration){
                 next_course_registration = await Course_registration.findOne({user_id, course_id, course_iteration_id: course_iteration.next_course_iteration._id})
             }
+            return {course_registration, next_course_registration}
         }catch (e) {
             console.log("error ", e)
         }
