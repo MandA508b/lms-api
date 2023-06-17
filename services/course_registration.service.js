@@ -24,6 +24,11 @@ class courseRegistrationService{
                 throw ApiError.notFound('Ітерацію не знайдено!')
             }
 
+            const candidate = await Course_registration.findOne({course_id, user_id, course_iteration_id: course_iteration._id})
+            if(candidate!==null){
+                return candidate
+            }
+
             const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iteration._id})
             course_iteration.participants = course_iteration.participants + 1
             await course_iteration.save()
