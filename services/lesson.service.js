@@ -108,7 +108,7 @@ class lessonService{
             let date = await timeService.getDate(1);
             let missedDays = 0
 
-            if((userAnswers.length - 1) >= 0)
+            if((userAnswers.length - 1) > 0)
             missedDays = date.dd - userAnswers[userAnswers.length - 1].created_at.slice(8) - 1
 
             date = date.yyyy + '.' + date.mm + '.' + date.dd;
