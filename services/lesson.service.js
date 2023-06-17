@@ -116,7 +116,7 @@ class lessonService{
                 return {lesson: null, missedDays, tillFinish}
             }
 
-            if(userAnswers.length===0)return lesson[0]
+            if(userAnswers.length===0)return {lesson: lesson[0], missedDays, tillFinish}
             if(userAnswers[userAnswers.length - 1].is_correct === false){
                 point -= 1
             }
