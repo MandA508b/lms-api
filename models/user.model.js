@@ -12,10 +12,6 @@ const schema = new db.Schema({
         required: true,
         trim: true
     },
-    email_verified_at: {
-        type: Boolean,
-        default: false
-    },
     usdt_wallet: {
         type: String,
         trim: true
@@ -23,6 +19,13 @@ const schema = new db.Schema({
     role: {
         type: String,
         required: true //student, teacher, admin
+    },
+    activationLink: {
+        type: String
+    },
+    isActivated: {
+        type: Boolean,
+        default: false
     }
 });
 

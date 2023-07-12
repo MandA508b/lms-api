@@ -1,7 +1,9 @@
 const User = require('../models/user.model')
 const bcrypt = require('bcrypt')
+const uuid = require('uuid')
 const ApiError = require(`../errors/api.error`)
 const tokenService = require('../services/token.service')
+const mailService = require('../services/mail.service')
 const UserDto = require('../dtos/user.dto')
 
 class userService{
@@ -29,8 +31,9 @@ class userService{
             }
             const hashPassword = await bcrypt.hash(password, 3)
             const time = new Date().toISOString()
-            const user = await User.create({email, password: hashPassword, time, role})
-            console.log({user}            )
+            const activationLink = uuid.v4()
+            const user = await User.create({email, password: hashPassword, time, role, activationLink})
+            await mailService.sendActivationMail(email, `${process.env.API_URL}/user/activate/${activationLink}`)
             const userDto = new UserDto(user)
             const tokens = await tokenService.generateTokens({...userDto})
             await tokenService.saveToken(userDto.id, userDto.role, userDto.email, tokens.refreshToken)
@@ -102,6 +105,10 @@ class userService{
         }catch (e) {
             console.log("error: ", e)
         }
+    }
+
+    async activation(activationLink){
+        const user = await User.findOneAndUpdate({activationLink}, {isActivated: true})
     }
 
 }
