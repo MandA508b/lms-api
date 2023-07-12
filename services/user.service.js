@@ -33,7 +33,7 @@ class userService{
             const time = new Date().toISOString()
             const activationLink = uuid.v4()
             const user = await User.create({email, password: hashPassword, time, role, activationLink})
-            await mailService.sendActivationMail(email, `${process.env.API_URL}/user/activate/${activationLink}`)
+            await mailService.sendActivationMail(email, `${process.env.SERVER_URL}/user/activate/${activationLink}`)
             const userDto = new UserDto(user)
             const tokens = await tokenService.generateTokens({...userDto})
             await tokenService.saveToken(userDto.id, userDto.role, userDto.email, tokens.refreshToken)
