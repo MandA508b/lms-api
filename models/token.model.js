@@ -9,10 +9,6 @@ const schema = new db.Schema({
         type: String,
         required: true
     },
-    login: {
-      type: String,
-      required: true
-    },
     refreshToken:{
         type: String,
         required: true

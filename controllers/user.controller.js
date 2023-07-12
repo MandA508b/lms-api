@@ -102,6 +102,16 @@ class userController{
         }
     }
 
+    async activate(req, res, next){
+        try{
+            const activationLink = req.params.link
+            await userService.activation(activationLink)
+            return res.redirect(process.env.API_URL)
+        }catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new userController()
