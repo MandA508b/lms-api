@@ -5,11 +5,11 @@ class courseController{
 
     async create(req,res,next) {
         try {
-            const {user_id, name, description} = req.body
-            if(!user_id || !name || !description) {
+            const {user_id, name, description, duration} = req.body
+            if(!user_id || !name || !description || !duration) {
                 return next(ApiError.badRequest())
             }
-            const course = await courseService.create(user_id, name, description)
+            const course = await courseService.create(user_id, name, description, duration)
 
             return res.json(course)
         } catch (e) {
@@ -72,11 +72,11 @@ class courseController{
 
     async publishCourse(req ,res, next) {
         try {
-            const {course_id} = req.body
-            if (!course_id) {
+            const {course_id, start_at} = req.body
+            if (!course_id || !start_at) {
                 return next(ApiError.badRequest())
             }
-            const course = await courseService.publishCourse(course_id)
+            const course = await courseService.publishCourse(course_id, start_at)
 
             return res.json(course)
         } catch (e) {

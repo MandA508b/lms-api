@@ -10,11 +10,11 @@ const schema = new db.Schema({
         default: 0
     },
     start_at: {
-        type: String,
+        type: Number,
         required: true
     },
     finish_at: {
-        type: String,
+        type: Number,
         required: true
     }
 })

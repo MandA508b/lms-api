@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const errorHandlingMiddleware = require('./middlewares/error_handling.middleware')
 const courseIterationService = require('./services/course_iteration.service')
+const mongoose = require('mongoose')
 
 const app = express();
 const PORT = process.env.PORT || 5001
@@ -33,10 +34,9 @@ start();
 
 let CronJob = require('cron').CronJob,
     job = new CronJob(// cron options + func
-        '0 0 0 1 * *',
+        '1 * */1 * *',
         async function () {// function to add course iterations
-            const course_iterations = await courseIterationService.createIterationsMonthly()
-            console.log("added " + course_iterations + " iterations\n")
+            await courseIterationService.createIterationsMonthly()
         },
         null,
         true

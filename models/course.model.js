@@ -24,6 +24,10 @@ const schema = new db.Schema({
     is_published: {
        type: Boolean,
        default: false
+    },
+    duration: {
+        type: Number,
+        required: true
     }
 })
 
