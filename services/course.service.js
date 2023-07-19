@@ -8,9 +8,9 @@ const ApiError = require(`../errors/api.error`)
 
 class courseService{
 
-    async create(user_id, name, description) {
+    async create(user_id, name, description, duration) {
         try{
-            const course = await Course.create({user_id, name, description})
+            const course = await Course.create({user_id, name, description, duration})
             const course_rating = await CourseRating.create({course_id: course._id})
             return {course, course_rating}
         }catch (e) {
@@ -93,16 +93,15 @@ class courseService{
         }
     }
 
-    async publishCourse(course_id){
+    async publishCourse(course_id, start_at){
         try {
             const course = await Course.findById(course_id)
             if(course===null || course.is_published===true){
-                throw ApiError.notFound('Курс не знайдено!')
+                throw ApiError.notFound('Курс не знайдено або вже розпочато!')
             }
             course.is_published=true
             await course.save()
-
-            const course_registration = await courseIterationService.create(course._id)
+            const course_registration = await courseIterationService.create(course._id, start_at, course.duration)
 
             return course
         }catch (e) {

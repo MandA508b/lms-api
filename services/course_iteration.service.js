@@ -1,22 +1,33 @@
 const Course_iteration = require('../models/course_iteration.model')
+const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
-const Course =require('./course.service')
+const courseService =require('./course.service')
 const timeService = require('./time.service')
 
 class courseIterationService{
 
-    async createIterationsMonthly(){
+    async createIterationsMonthly(){//todo: here?
         try{
-            let start_at = await timeService.getDate(2);
-            start_at = start_at.yyyy + '.' + start_at.mm + '.' + start_at.dd;
+            let date = new Date().getTime()
+            date = date - date % 86400000
+            let start_at = date
 
-            let finish_at = await timeService.getDate(3);
-            finish_at = finish_at.yyyy + '.' + finish_at.mm + '.' + finish_at.dd;
-
-            const courses = await Course.findAll()
+            const courses = await Course.find()
             for (let key in courses) {
-                const course_iteration = await this.create(courses[key]._id, start_at, finish_at)
-                //todo: calculate exist iterations
+                try{
+                    start_at = date + courses[key].duration * 86400000
+                    const finish_at = start_at + courses[key].duration * 86400000
+                    const finish_at_next = start_at + courses[key].duration * 86400000
+                    const candidate_course_iteration = await Course_iteration.find({course_id: courses[key]._id , finish_at: {$gt: start_at} })
+                    if(candidate_course_iteration.length!==0 || courses[key].is_published ===false)continue;
+                    const course_iteration = await Course_iteration.create({course_id: courses[key]._id, start_at, finish_at})
+                    const course_iteration_next = await Course_iteration.create({course_id: courses[key]._id, start_at: finish_at, finish_at: finish_at_next})
+                    //todo: calculate exist iterations
+                }catch(e){
+                    courses[key].is_published=false
+                    courses[key].save()
+                    console.log("error on courseId: ",courses[key], e)
+                }
             }
 
         }catch (e) {
@@ -24,18 +35,12 @@ class courseIterationService{
         }
     }
 
-    async create(course_id) {
+    async create(course_id, start_at, duration) {
         try{
-            let prev_start = await timeService.getDate(1);
-            prev_start = prev_start.yyyy + '.' + prev_start.mm + '.' + "01";
-
-            let start_at = await timeService.getDate(2);
-            start_at = start_at.yyyy + '.' + start_at.mm + '.' + "01";
-
-            let finish_at = await timeService.getDate(3);
-            finish_at = finish_at.yyyy + '.' + finish_at.mm + '.' + "01";
-
-            const course_iteration = await Course_iteration.create({course_id, start_at: prev_start , finish_at: start_at})
+            start_at = start_at - start_at % 86400000
+            const finish_at = start_at + duration * 86400000
+            const finish_at_next = start_at + duration * 86400000 * 2
+            const course_iteration = await Course_iteration.create({course_id, start_at: finish_at , finish_at: finish_at_next})
             return await Course_iteration.create({course_id, start_at, finish_at})
         }catch (e) {
             console.log("error: ", e)
@@ -45,7 +50,8 @@ class courseIterationService{
     async findById(course_iteration_id){
         try {
             const course_iteration = await Course_iteration.findById(course_iteration_id)
-            if(course_iteration === undefined){
+            console.log(course_iteration)
+            if(course_iteration === null){
                 throw ApiError.badRequest('Курс не знайдено!')
             }
 
@@ -55,7 +61,7 @@ class courseIterationService{
         }
     }
 
-    async findByUser(user_id){
+    async findByUser(user_id){//todo: perepisat
         try {
             const course_iterations = await Course_iteration.find({user_id})//todo : modify by query
             let relevant_course_iterations =[]
@@ -65,7 +71,7 @@ class courseIterationService{
 
             for(let key in course_iterations){
                 if(course_iterations[key].start_at <= date && course_iterations[key].finish_at > date){
-                    const course = await Course.findById(course_iterations[key].course_id)
+                    const course = await courseService.findById(course_iterations[key].course_id)
                     relevant_course_iterations.push({course_iteration_id: course_iterations[key]._id, course})
                 }
             }
@@ -78,12 +84,18 @@ class courseIterationService{
 
     async actualIteration(course_id){
         try{
-            let date = await timeService.getDate(1)
-            let date2 = await timeService.getDate(2)
-            date = date.yyyy + '.' + date.mm + '.01';
-            date2 = date2.yyyy + '.' + date2.mm + '.01';
-            const course_iteration = await Course_iteration.findOne({course_id, start_at: date})
-            const next_course_iteration = await Course_iteration.findOne({course_id, start_at: date2})
+            const course = await Course.findById(course_id)
+            if (course===null){
+                throw ApiError.badRequest()
+            }
+            let date = new Date().getTime()
+
+            const course_iteration = await Course_iteration.findOne({course_id,  finish_at: { $gte: date }, start_at: { $lte: date } })
+
+            date = date + course.duration * 86400000
+
+            const next_course_iteration = await Course_iteration.findOne({course_id, finish_at: { $gte: date }, start_at: { $lte: date } })
+
             return {course_iteration, next_course_iteration}
         }catch (e) {
             console.log("error: ", e)
