@@ -30,7 +30,7 @@ class lessonQuestionService{
 
     async findAllByLesson(lesson_id) {
         try{
-            return await Lesson_question.find({lesson_id})
+            return await Lesson_question.find({lesson_id}).sort({time_show: 1})
         }catch (e) {
             console.log("error: ", e)
         }

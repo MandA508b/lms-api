@@ -99,7 +99,7 @@ class lessonService{
         async findActualLesson(course_id, course_iteration_id, user_id){
         try {
             const lesson = await this.findAllByCourse(course_id)
-            const userAnswers = await UserAnswer.find({course_iteration_id, user_id}).sort({created_at: 1})//todo: -1?
+            const userAnswers = await UserAnswer.find({course_iteration_id, user_id}).sort({created_at: 1})
             let point = userAnswers.length
             const tillFinish = lesson.length - point
             let missedDays = 0
