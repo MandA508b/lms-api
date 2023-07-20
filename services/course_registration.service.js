@@ -1,8 +1,6 @@
 const Course_registration = require('../models/course_registration.model')
-const Course_iteration = require('../models/course_iteration.model')
 const User = require('../models/user.model')
 const Course = require('../models/course.model')
-const timeService = require('./time.service')
 const ApiError = require(`../errors/api.error`)
 const courseIterationService = require('./course_iteration.service')
 

@@ -4,7 +4,6 @@ const Lesson_question = require('../models/lesson_question.model')
 const UserAnswer = require('../models/user_answer.model')
 const Course = require('../models/course.model')
 const lessonQuestionService = require('./lesson_question.service')
-const timeService = require('./time.service')
 const ApiError = require(`../errors/api.error`)
 
 class lessonService{
@@ -12,8 +11,7 @@ class lessonService{
     async createFullLesson(data, video){
         try{
 
-            let created_at = await timeService.getDate(1);
-            created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd + '.' + created_at.h + '.' + created_at.m + '.' + created_at.s;
+            let created_at = new Date().getTime()
             const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at, video_duration: data.duration})
             const lesson_rating = await LessonRating.create({lesson_id: lesson._id, course_id: data.course_id})
             const course = await Course.findById(data.course_id)
@@ -36,8 +34,7 @@ class lessonService{
             const course = await Course.findById(course_id)
             course.lessons = course.lessons + 1
             await course.save()
-            let created_at = await timeService.getDate(1);//todo: add numbering
-            created_at = created_at.yyyy + '.' + created_at.mm + '.' + created_at.dd;
+            let created_at = new Date().getTime()
             const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at, video_duration: duration})
             return lesson
         }catch (e) {
@@ -105,13 +102,13 @@ class lessonService{
             const userAnswers = await UserAnswer.find({course_iteration_id, user_id}).sort({created_at: 1})//todo: -1?
             let point = userAnswers.length
             const tillFinish = lesson.length - point
-            let date = await timeService.getDate(1);
             let missedDays = 0
 
-            if(userAnswers.length > 0 && tillFinish !== 0)
-            missedDays = Math.max(0, date.dd - userAnswers[userAnswers.length - 1].created_at.slice(8) - 1)
+            const date = new Date().getTime()
 
-            date = date.yyyy + '.' + date.mm + '.' + date.dd;
+            if(userAnswers.length > 0 && tillFinish !== 0)
+            missedDays = Math.max(0, Math.floor((date - userAnswers[userAnswers.length - 1].created_at)/86400000))
+
             if(lesson.length <= point){
                 return {lesson: null, missedDays, tillFinish}
             }
@@ -122,7 +119,7 @@ class lessonService{
             }
 
 
-            if(userAnswers[userAnswers.length - 1].created_at===date){
+            if((userAnswers[userAnswers.length - 1].created_at - userAnswers[userAnswers.length - 1].created_at%86400000)===(date - date%86400000)){
                 return {lesson: null, missedDays, tillFinish}
             }
 

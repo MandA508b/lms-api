@@ -2,7 +2,6 @@ const Course_iteration = require('../models/course_iteration.model')
 const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
 const courseService =require('./course.service')
-const timeService = require('./time.service')
 
 class courseIterationService{
 
@@ -68,8 +67,7 @@ class courseIterationService{
             const course_iterations = await Course_iteration.find({user_id})//todo : modify by query
             let relevant_course_iterations =[]
 
-            let date = await timeService.getDate(1);
-            date = date.yyyy + '.' + date.mm + '.' + date.dd;
+            let date = new Date().getTime()
 
             for(let key in course_iterations){
                 if(course_iterations[key].start_at <= date && course_iterations[key].finish_at > date){
