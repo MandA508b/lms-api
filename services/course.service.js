@@ -25,8 +25,7 @@ class courseService{
             for (let key in courses) {
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
-
-                if(course_iteration.course_iteration===null && course_iteration.next_course_iteration===null)continue;
+                if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
 
                 const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
                 if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
@@ -60,8 +59,7 @@ class courseService{
             let courses_list = []
             for (let key in courses) {
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
-                if(course_iteration.course_iteration===null && course_iteration.next_course_iteration===null)continue;
-                console.log(course_iteration)
+                if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
 
                 if(course_iteration.course_iteration!==null){
@@ -100,7 +98,9 @@ class courseService{
             const course = await Course.findById(course_id)
             const courseRating = await CourseRating.findOne({course_id: course_id})
             const course_iteration = await courseIterationService.actualIteration(course_id)
-
+            if(course_iteration===undefined || (course_iteration.course_iteration===null)) {
+                return {course, courseRating: {rating: courseRating.rating, votes: courseRating.votes}}
+            }
             const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration.course_iteration._id)
 
             return {course, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id, participants: course_iteration.course_iteration.participants}
