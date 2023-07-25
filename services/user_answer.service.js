@@ -1,5 +1,6 @@
 const User_answer = require('../models/user_answer.model')
 const Course_iteration = require('../models/course_iteration.model')
+const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
 
 class userAnswerService{
@@ -27,6 +28,12 @@ class userAnswerService{
             const user_answers = await User_answer.find({user_id, course_iteration_id}).sort({created_at: -1})
             if(user_answers.length===0 || (user_answers.length>0 && (date - date%86400000)-(user_answers[0].created_at-user_answers[0].created_at%86400000)<86400000*2)){
                 in_time = true
+
+                const course = await Course.findById(course_iteration.course_id)
+                if(course !== null && (user_answers.length + 1) === course.lessons){
+                    //todo: calculate
+                }
+
             }
 
             return await User_answer.create({user_id, course_iteration_id, lesson_id, in_time, is_correct, created_at: date})
