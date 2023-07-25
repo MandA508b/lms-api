@@ -5,11 +5,11 @@ class courseController{
 
     async create(req,res,next) {
         try {
-            const {user_id, name, description, duration} = req.body
-            if(!user_id || !name || !description || !duration) {
+            const {user_id, name, description, duration, price} = req.body
+            if(!user_id || !name || !description || !duration || price === undefined) {
                 return next(ApiError.badRequest())
             }
-            const course = await courseService.create(user_id, name, description, duration)
+            const course = await courseService.create(user_id, name, description, duration, price)
 
             return res.json(course)
         } catch (e) {
@@ -63,6 +63,20 @@ class courseController{
                 return next(ApiError.badRequest())
             }
             const course = await courseService.findById(course_id)
+
+            return res.json(course)
+        }catch (e) {
+            next(e)
+        }
+    }
+
+    async findByIdAsAuthor(req, res, next){
+        try{
+            const {course_id} = req.query
+            if(course_id === undefined){
+                return next(ApiError.badRequest())
+            }
+            const course = await courseService.findByIdAuthor(course_id)
 
             return res.json(course)
         }catch (e) {

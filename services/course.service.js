@@ -8,9 +8,9 @@ const ApiError = require(`../errors/api.error`)
 
 class courseService{
 
-    async create(user_id, name, description, duration) {
+    async create(user_id, name, description, duration, price) {
         try{
-            const course = await Course.create({user_id, name, description, duration})
+            const course = await Course.create({user_id, name, description, duration, price})
             const course_rating = await CourseRating.create({course_id: course._id})
             return {course, course_rating}
         }catch (e) {
@@ -25,8 +25,8 @@ class courseService{
             for (let key in courses) {
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
+                console.log(courses[key].name, course_iteration, courses[key]._id)
                 if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
-
                 const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
                 if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
                     if(course_iteration.course_iteration!==null){
@@ -94,6 +94,22 @@ class courseService{
     }
 
     async findById(course_id){
+        try {
+            const course = await Course.findById(course_id)
+            const courseRating = await CourseRating.findOne({course_id: course_id})
+            const course_iteration = await courseIterationService.actualIteration(course_id)
+            if(course_iteration===undefined || (course_iteration.course_iteration===null)) {
+                return {course, courseRating: {rating: courseRating.rating, votes: courseRating.votes}}
+            }
+            const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration.course_iteration._id)
+
+            return {course, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id, participants: course_iteration.course_iteration.participants}
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async findByIdAsAuthor(course_id){
         try {
             const course = await Course.findById(course_id)
             const courseRating = await CourseRating.findOne({course_id: course_id})
