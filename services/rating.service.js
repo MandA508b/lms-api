@@ -3,7 +3,7 @@ const LessonRating = require('../models/lesson_rating.model')
 const CourseRating = require('../models/course_rating.model')
 const ApiError = require('../errors/api.error')
 
-class timeService{
+class ratingService{
 
     async createLessonRating(user_id, lesson_id, rating){
         try{
@@ -29,4 +29,4 @@ class timeService{
     }
 
 }
-module.exports = new timeService()
+module.exports = new ratingService()

@@ -1,4 +1,5 @@
 const User = require('../models/user.model')
+const User_wallets = require('../models/user_wallet.model')
 const bcrypt = require('bcrypt')
 const uuid = require('uuid')
 const ApiError = require(`../errors/api.error`)
@@ -37,8 +38,9 @@ class userService{
             const userDto = new UserDto(user)
             const tokens = await tokenService.generateTokens({...userDto})
             await tokenService.saveToken(userDto.id, userDto.role, userDto.email, tokens.refreshToken)
+            const user_wallet = await User_wallets.create({user_id: user._id, })
 
-            return ({...tokens, user: user})
+            return ({...tokens, user, user_wallet})
         }catch (e) {
             console.log("error: ", e)
         }

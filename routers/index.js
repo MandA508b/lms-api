@@ -11,6 +11,9 @@ const lessonQuestionRouter = require('./lesson_question.router')
 const ratingRouter = require('./rating.router')
 const videoRouter = require('./video.router')
 const userInfoRouter = require('./user_info.router')
+const userWalletRouter = require('./user_wallet.router')
+const exeRouter = require('./exe.router')
+const transactionRouter = require('./transaction.router')
 
 router.use('/user', userRouter)
 router.use('/userAnswer', userAnswerRouter)
@@ -23,5 +26,8 @@ router.use('/lessonQuestion', lessonQuestionRouter)
 router.use('/rating', ratingRouter)
 router.use('/video', videoRouter)
 router.use('/userInfo', userInfoRouter)
+router.use('/userWallet', userWalletRouter)
+router.use('/exe', exeRouter)
+router.use('/transaction', transactionRouter)
 
 module.exports = router

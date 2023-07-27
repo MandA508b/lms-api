@@ -2,10 +2,11 @@ const Course_iteration = require('../models/course_iteration.model')
 const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
 const courseService =require('./course.service')
+const courseWinnerPayoutService = require('./course_winner_payout.service')
 
 class courseIterationService{
 
-    async createIterationsMonthly(){//todo: here?
+    async createIterationsMonthly(){
         try{
             let date = new Date().getTime()
             date = date - date % 86400000
@@ -23,7 +24,9 @@ class courseIterationService{
                         const course_iteration = await Course_iteration.create({course_id: courses[key]._id, start_at, finish_at})
                     }
                     const next_course_iteration = await Course_iteration.create({course_id: courses[key]._id, start_at: finish_at, finish_at: finish_at_next})
-                    //todo: calculate exist iterations
+
+                    // calculating course winners for exist iterations
+                    await courseWinnerPayoutService.calcPayoutsForCourseIteration(courses[key])//todo: async?
                 }catch(e){
                     courses[key].is_published=false
                     courses[key].save()
@@ -93,8 +96,7 @@ class courseIterationService{
             const course_iteration = await Course_iteration.findOne({course_id,  finish_at: { $gte: date }, start_at: { $lte: date } })
             date = date + course.duration * 86400000
             const next_course_iteration = await Course_iteration.find({course_id, finish_at: { $gte: date }}).sort({start_at: 1 })
-
-
+            
             return {course_iteration, next_course_iteration: next_course_iteration[0]}
         }catch (e) {
             console.log("error: ", e)
