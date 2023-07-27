@@ -3,6 +3,7 @@ const User = require('../models/user.model')
 const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
 const courseIterationService = require('./course_iteration.service')
+const exeService = require('./exe.service')
 
 class courseRegistrationService{
 
@@ -10,6 +11,7 @@ class courseRegistrationService{
         try{
             const user = await User.findById(user_id)//checking for the relevance of the user
             const course = await Course.findById(course_id)//checking for the relevance of the course
+            const exe_price = await exeService.getPrice()
 
             if(user === null || course === null || course.is_published === false){
                 throw ApiError.notFound('Користувача або курсу не знайдено!')
