@@ -65,7 +65,7 @@ class courseIterationService{
         }
     }
 
-    async findByUser(user_id){//todo: perepisat
+    async findByUser(user_id){
         try {
             const course_iterations = await Course_iteration.find({user_id})//todo : modify by query
             let relevant_course_iterations =[]

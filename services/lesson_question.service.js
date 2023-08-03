@@ -59,5 +59,15 @@ class lessonQuestionService{
         }
     }
 
+    async updateName(lesson_question_id, name){
+        try {
+            return await Lesson_question.findByIdAndUpdate(lesson_question_id, {name})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+
+
 }
 module.exports = new lessonQuestionService()

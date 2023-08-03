@@ -16,6 +16,8 @@ const upload = multer({ storage: storage })
 
 router.post('/create', upload.single('video'), lessonController.create)
 router.post('/createFullLesson', upload.single('video'), lessonController.createFullLesson)
+router.put('/updateNumberLesson', lessonController.updateNumberLesson)
+router.put('/updateName', lessonController.updateName)
 router.get('/findAll', lessonController.findAllByCourse)
 router.get('/findById', lessonController.findById)
 router.get('/findActualLesson', lessonController.findActualLesson)

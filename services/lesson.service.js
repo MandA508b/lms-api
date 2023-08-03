@@ -1,7 +1,7 @@
 const Lesson = require('../models/lesson.model')
 const LessonRating = require('../models/lesson_rating.model')
 const Lesson_question = require('../models/lesson_question.model')
-const UserAnswer = require('../models/user_answer.model')
+const User_answer = require('../models/user_answer.model')
 const Course = require('../models/course.model')
 const lessonQuestionService = require('./lesson_question.service')
 const ApiError = require(`../errors/api.error`)
@@ -12,9 +12,9 @@ class lessonService{
         try{
 
             let created_at = new Date().getTime()
-            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at, video_duration: data.duration})
-            const lesson_rating = await LessonRating.create({lesson_id: lesson._id, course_id: data.course_id})
             const course = await Course.findById(data.course_id)
+            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at, video_duration: data.duration, number: course.lessons + 1})
+            const lesson_rating = await LessonRating.create({lesson_id: lesson._id, course_id: data.course_id})
             course.lessons = course.lessons + 1
             await course.save()
 
@@ -32,10 +32,10 @@ class lessonService{
         try{
 
             const course = await Course.findById(course_id)
+            let created_at = new Date().getTime()
+            const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at, video_duration: duration, number: course.lessons + 1})
             course.lessons = course.lessons + 1
             await course.save()
-            let created_at = new Date().getTime()
-            const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at, video_duration: duration})
             return lesson
         }catch (e) {
             console.log("error: ", e)
@@ -44,7 +44,16 @@ class lessonService{
 
     async findAllByCourse(course_id) {
         try{
-            return await Lesson.find({course_id}).sort({created_at: 1})
+            return await Lesson.find({course_id}).sort({number: 1})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async findAllPassedByCourse(course_iteration_id, user_id) {
+        try{
+            let passed_lessons = await User_answer.find({course_iteration_id, user_id})
+            return passed_lessons
         }catch (e) {
             console.log("error: ", e)
         }
@@ -52,12 +61,12 @@ class lessonService{
 
     async findAllByCourseAuthor(course_id, course_iteration_id) {
         try{
-            const lessons = await Lesson.find({course_id}).sort({created_at: 1})
+            const lessons = await Lesson.find({course_id}).sort({number: 1})
             let lessons_list = []
 
             for(let key in lessons){
                 const lessons_rating = await LessonRating.findOne({lesson_id: lessons[key]._id})
-                const passed = await UserAnswer.find({course_iteration_id, lesson_id: lessons[key]._id, is_correct: true})
+                const passed = await User_answer.find({course_iteration_id, lesson_id: lessons[key]._id, is_correct: true})
                 lessons_list.push({lesson: lessons[key], rating: {rating: lessons_rating.rating, votes: lessons_rating.votes}, passed: passed.length})
             }
 
@@ -99,7 +108,7 @@ class lessonService{
         async findActualLesson(course_id, course_iteration_id, user_id){
         try {
             const lesson = await this.findAllByCourse(course_id)
-            const userAnswers = await UserAnswer.find({course_iteration_id, user_id}).sort({created_at: 1})
+            const userAnswers = await User_answer.find({course_iteration_id, user_id}).sort({created_at: 1})
             let point = userAnswers.length
             const tillFinish = lesson.length - point
             let missedDays = 0
@@ -124,6 +133,47 @@ class lessonService{
             }
 
             return {lesson: lesson[point], missedDays, tillFinish}
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async updateNumberLesson(lesson_id, number){
+        try {
+            const lesson = await Lesson.findById(lesson_id)
+            if(lesson===null){
+                throw ApiError.notFound()
+            }
+            const lessons = await Lesson.find({course_id: lesson.course_id}).sort({number: 1})
+            if(lessons.length < number || number <= 0){
+                throw ApiError.badRequest()
+            }
+            if(lesson.number === number)return lessons
+            if(lesson.number < number){
+                for(let i = lesson.number + 1; i <= number; i++){
+                    lessons[i - 1].number = lessons[i - 1].number - 1
+                    lessons[i - 1].save()
+                }
+                lessons[lesson.number - 1].number = number
+                await lessons[lesson.number - 1].save()
+            }else{
+                for(let i = number; i < lesson.number ; i++){
+                    lessons[i - 1].number = lessons[i - 1].number + 1
+                    lessons[i - 1].save()
+                }
+                lessons[lesson.number - 1].number = number
+                await lessons[lesson.number - 1].save()
+            }
+            lessons.sort()
+            return  lessons
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async updateName(lesson_id, name){
+        try {
+            return await Lesson.findByIdAndUpdate(lesson_id, {name})
         }catch (e) {
             console.log("error: ", e)
         }

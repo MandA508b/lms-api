@@ -28,6 +28,10 @@ const schema = new db.Schema({
     created_at: {
         type: String,
         required: true
+    },
+    number: {
+        type: Number,
+        required: true
     }
 })
 
