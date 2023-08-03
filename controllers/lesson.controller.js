@@ -1,5 +1,6 @@
 const ApiError = require(`../errors/api.error`)
 const lessonService = require('../services/lesson.service')
+const courseService = require("../services/course.service");
 
 class lessonController{
 
@@ -89,6 +90,34 @@ class lessonController{
 
             return res.json(lesson)
         }catch (e) {
+            next(e)
+        }
+    }
+
+    async updateNumberLesson(req, res, next){
+        try{
+            const {lesson_id, number} = req.body
+            if(!lesson_id || !number){
+                return next(ApiError.badRequest())
+            }
+            const lesson = await lessonService.updateNumberLesson(lesson_id, number)
+
+            return res.json(lesson)
+        }catch (e) {
+            next(e)
+        }
+    }
+
+    async updateName(req ,res, next) {
+        try {
+            const {lesson_id, name} = req.body
+            if (!lesson_id || !name) {
+                return next(ApiError.badRequest())
+            }
+            const course = await lessonService.updateName(lesson_id, name)
+
+            return res.json(course)
+        } catch (e) {
             next(e)
         }
     }

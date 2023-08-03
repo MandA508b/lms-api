@@ -70,13 +70,13 @@ class courseController{
         }
     }
 
-    async findByIdAsAuthor(req, res, next){
+    async findUserCourses(req, res, next){
         try{
-            const {course_id} = req.query
-            if(course_id === undefined){
+            const {user_id} = req.query
+            if(user_id === undefined){
                 return next(ApiError.badRequest())
             }
-            const course = await courseService.findByIdAuthor(course_id)
+            const course = await courseService.findUserCourses(user_id)
 
             return res.json(course)
         }catch (e) {
@@ -91,6 +91,34 @@ class courseController{
                 return next(ApiError.badRequest())
             }
             const course = await courseService.publishCourse(course_id, start_at)
+
+            return res.json(course)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    async updateName(req ,res, next) {
+        try {
+            const {course_id, name} = req.body
+            if (!course_id || !name) {
+                return next(ApiError.badRequest())
+            }
+            const course = await courseService.updateName(course_id, name)
+
+            return res.json(course)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    async updateDescription(req ,res, next) {
+        try {
+            const {course_id, description} = req.body
+            if (!course_id || !description) {
+                return next(ApiError.badRequest())
+            }
+            const course = await courseService.updateDescription(course_id, description)
 
             return res.json(course)
         } catch (e) {

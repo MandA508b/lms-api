@@ -2,6 +2,8 @@ const Course = require('../models/course.model')
 const Lesson = require('../models/lesson.model')
 const lessonService = require('./lesson.service')
 const CourseRating = require('../models/course_rating.model')
+const Course_iteration = require('../models/course_iteration.model')
+const Course_registration = require('../models/course_registration.model')
 const courseRegistrationService = require('../services/course_registration.service')
 const courseIterationService = require('./course_iteration.service')
 const ApiError = require(`../errors/api.error`)
@@ -109,17 +111,21 @@ class courseService{
         }
     }
 
-    async findByIdAsAuthor(course_id){
+    async findUserCourses(user_id){
         try {
-            const course = await Course.findById(course_id)
-            const courseRating = await CourseRating.findOne({course_id: course_id})
-            const course_iteration = await courseIterationService.actualIteration(course_id)
-            if(course_iteration===undefined || (course_iteration.course_iteration===null)) {
-                return {course, courseRating: {rating: courseRating.rating, votes: courseRating.votes}}
+            const user_iterations = await Course_registration.find({user_id})
+            console.log(user_iterations)
+            let courses = []
+            for (let key in user_iterations) {
+                const course = await Course.findById(user_iterations[key].course_id)
+                const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
+                const course_rating = await CourseRating.findOne({course_id: user_iterations[key].course_id})
+                const passes_lessons = await lessonService.findAllPassedByCourse(user_iterations[key].course_iteration_id, user_id)
+                const actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
+                courses.push({course, course_rating, passes_lessons, actual_lesson, course_iteration})
             }
-            const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration.course_iteration._id)
 
-            return {course, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, lessons, course_iteration_id: course_iteration._id, participants: course_iteration.course_iteration.participants}
+            return courses
         }catch (e) {
             console.log("error: ", e)
         }
@@ -136,6 +142,22 @@ class courseService{
             const course_registration = await courseIterationService.create(course._id, start_at, course.duration)
 
             return course
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async updateName(course_id, name){
+        try {
+            return await Course.findByIdAndUpdate(course_id, {name})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async updateDescription(course_id, description){
+        try {
+            return await Course.findByIdAndUpdate(course_id, {description})
         }catch (e) {
             console.log("error: ", e)
         }

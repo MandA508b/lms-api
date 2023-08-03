@@ -59,6 +59,20 @@ class lessonAnswerController{
         }
     }
 
+    async updateLessonAnswer(req, res, next){
+        try{
+            const {lesson_answer_id, name, is_true} = req.body
+            if(!lesson_answer_id || !name || is_true===undefined){
+                return next(ApiError.badRequest())
+            }
+            const lesson_answer = await lessonAnswerService.updateLessonAnswer(lesson_answer_id, name, is_true)
+
+            return res.json(lesson_answer)
+        }catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new lessonAnswerController()

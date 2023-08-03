@@ -41,5 +41,13 @@ class lessonAnswerService{
         }
     }
 
+    async updateLessonAnswer(lesson_answer_id, name, is_true){
+        try {
+            return await Lesson_answer.findByIdAndUpdate(lesson_answer_id, {name, is_true})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
 }
 module.exports = new lessonAnswerService()

@@ -59,6 +59,20 @@ class lessonQuestionController{
         }
     }
 
+    async updateName(req ,res, next) {
+        try {
+            const {lesson_question_id, name} = req.body
+            if (!lesson_question_id || !name) {
+                return next(ApiError.badRequest())
+            }
+            const course = await lessonQuestionService.updateName(lesson_question_id, name)
+
+            return res.json(course)
+        } catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new lessonQuestionController()
