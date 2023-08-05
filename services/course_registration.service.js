@@ -18,23 +18,24 @@ class courseRegistrationService{
             }//checked!
 
             const course_iterations = await courseIterationService.actualIteration(course_id)
-            if(course_iterations.course_iteration === null){
-                throw ApiError.notFound('Ітерацію не знайдено!')
+            console.log({course_iterations})
+            if(course_iterations.course_iteration !== null){
+                const candidate = await Course_registration.findOne({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
+                if(candidate!==null){
+                    return candidate
+                }
+                let date = new Date().getTime()
+                date = date - date % 86400000
+                const days_until_end = (course_iterations.course_iteration.finish_at - date)/86400000
+                if(days_until_end >= course.lessons){//registration actual iteration
+                    const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
+                    course_iterations.course_iteration.participants = course_iterations.course_iteration.participants + 1
+                    await course_iterations.course_iteration.save()
+                    return course_registration
+                }
             }
 
-            const candidate = await Course_registration.findOne({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
-            if(candidate!==null){
-                return candidate
-            }
-            let date = new Date().getTime()
-            date = date - date % 86400000
-            const days_until_end = (course_iterations.course_iteration.finish_at - date)/86400000
-            if(days_until_end >= course.lessons){//registration actual iteration
-                const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
-                course_iterations.course_iteration.participants = course_iterations.course_iteration.participants + 1
-                await course_iterations.course_iteration.save()
-                return course_registration
-            }
+
             if(course_iterations.next_course_iteration === null){
                 throw ApiError.notFound('Ітерацію не знайдено!')
             }
