@@ -114,15 +114,14 @@ class courseService{
     async findUserCourses(user_id){
         try {
             const user_iterations = await Course_registration.find({user_id})
-            console.log(user_iterations)
             let courses = []
             for (let key in user_iterations) {
                 const course = await Course.findById(user_iterations[key].course_id)
                 const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
                 const course_rating = await CourseRating.findOne({course_id: user_iterations[key].course_id})
-                const passes_lessons = await lessonService.findAllPassedByCourse(user_iterations[key].course_iteration_id, user_id)
+                const passed_lessons = await lessonService.findAllPassedByCourse(user_iterations[key].course_iteration_id, user_id)
                 const actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
-                courses.push({course, course_rating, passes_lessons, actual_lesson, course_iteration})
+                courses.push({course, course_rating, passed_lessons, actual_lesson, course_iteration})
             }
 
             return courses
