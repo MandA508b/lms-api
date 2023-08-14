@@ -27,9 +27,11 @@ class courseService{
             for (let key in courses) {
                 const courseRating = await CourseRating.findOne({course_id: courses[key]._id})
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
-                console.log(courses[key].name, course_iteration, courses[key]._id)
+
                 if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
+
                 const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
+
                 if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
                     if(course_iteration.course_iteration!==null){
                         courses_list.push({course: courses[key], registered: false, participants: course_iteration.course_iteration.participants, courseRating: {rating: courseRating.rating, votes: courseRating.votes}, course_iteration: course_iteration.course_iteration})
