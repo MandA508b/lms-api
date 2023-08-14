@@ -39,7 +39,7 @@ class userAnswerService{
 
             }
 
-            if(user_answers.length - 1 === course.lessons && is_correct){//author rewards
+            if((user_answers.length === course.lessons - 1) && is_correct){//author rewards//todo: прописати транзацкцію
                 const exe_price = await exeService.getPrice()
                 const usdt = (course.price)*0.1*0.8,
                     exe = ((course.price)*0.1*0.2)/exe_price
