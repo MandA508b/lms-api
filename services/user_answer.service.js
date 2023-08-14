@@ -33,7 +33,7 @@ class userAnswerService{
             if(user_answers.length===0 || (user_answers.length>0 && (date - date%86400000)-(user_answers[0].created_at-user_answers[0].created_at%86400000)<86400000*2)){
                 in_time = true
 
-                if((user_answers.length + 1) === course.lessons && is_correct){
+                if((user_answers.length === course.lessons - 1) && is_correct){
                     const course_iteration_winner = await Course_iteration_winner.create({user_id, course_iteration_id, course_id: course_iteration.course_id})
                 }
 

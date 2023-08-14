@@ -32,6 +32,10 @@ const schema = new db.Schema({
     price: {
         type: Number,
         required: true
+    },
+    language_id: {
+        type: db.Schema.Types.ObjectId,
+        required: true
     }
 })
 

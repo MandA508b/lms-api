@@ -32,9 +32,9 @@ function start(){
 
 start();
 
-let CronJob = require('cron').CronJob,
+let CronJob = require('cron').CronJob,//todo:
     job = new CronJob(// cron options + func
-        '1 * */1 * *',
+        '0 0 */1 * *',
         async function () {// function to add course iterations
             await courseIterationService.createIterationsMonthly()
         },
