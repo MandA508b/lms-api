@@ -94,10 +94,8 @@ class courseIterationService{
             let date = new Date().getTime()
 
             const course_iteration = await Course_iteration.findOne({course_id,  finish_at: { $gte: date }, start_at: { $lte: date } })
-            date = date + course.duration * 86400000
-            const next_course_iteration = await Course_iteration.find({course_id, finish_at: { $gte: date }}).sort({start_at: 1 })
-            
-            return {course_iteration, next_course_iteration: next_course_iteration[0]}
+            const next_course_iteration = await Course_iteration.findOne({ course_id, start_at: { $gt: date } })
+            return {course_iteration, next_course_iteration}
         }catch (e) {
             console.log("error: ", e)
         }
