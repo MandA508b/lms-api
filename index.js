@@ -41,4 +41,3 @@ let CronJob = require('cron').CronJob,//todo:
         null,
         true
     )
-

@@ -8,6 +8,7 @@ router.post('/refresh', userController.refresh)
 router.get('/findAll', userController.findAll)
 router.get('/findById', userController.findById)
 router.get('/activate/:link', userController.activate)
+router.get('/countUserWallet', userController.countUserWallet)
 router.post('/logout', userController.logout)
 
 module.exports = router

@@ -1,5 +1,6 @@
 const ApiError = require(`../errors/api.error`)
 const userService = require('../services/user.service')
+const transactionService = require('../services/transaction.service')
 
 class userController{
     async findAll(req,res,next){
@@ -106,11 +107,29 @@ class userController{
         try{
             const activationLink = req.params.link
             await userService.activation(activationLink)
+            
             return res.redirect(process.env.CLIENT_URL)
         }catch (e) {
             next(e)
         }
     }
+
+    async countUserWallet(req, res, next){
+        try{
+            const {user_id} = req.query
+            if(!user_id){
+                return ApiError.badRequest()
+            }
+            const user_wallet = await transactionService.countUserWallet(user_id)
+
+            return res.json(user_wallet)
+        }catch (e) {
+            next(e)
+        }
+    }
+
+
+
 
 }
 
