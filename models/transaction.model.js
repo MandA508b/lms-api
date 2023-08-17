@@ -5,18 +5,31 @@ const schema = new db.Schema({
         type: db.Schema.Types.ObjectId,
         required: true
     },
-    usdt: {
+    exe_price: {
         type: Number,
         required: true
     },
-    exe: {
+    exe_count: {
         type: Number,
         required: true
     },
-    kind: {// 'deposit' or 'withdraw'
+    usdt_count: {
+        type: Number,
+        required: true
+    },
+    kind: {// 'deposit', 'withdraw' or 'swap'   
         type: String,
         required: true
+    },
+    status: {
+        type: String,
+        required: true
+    },
+    created_at: {
+        type: Number,
+        default: () => new Date().getTime()
     }
+
 })
 
 module.exports = db.model('Transaction', schema)
