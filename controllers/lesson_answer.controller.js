@@ -61,11 +61,11 @@ class lessonAnswerController{
 
     async updateLessonAnswer(req, res, next){
         try{
-            const {lesson_answer_id, name, is_true} = req.body
-            if(!lesson_answer_id || !name || is_true===undefined){
+            const {lesson_answer_id, name, right_answer} = req.body
+            if(!lesson_answer_id || !name || right_answer===undefined){
                 return next(ApiError.badRequest())
             }
-            const lesson_answer = await lessonAnswerService.updateLessonAnswer(lesson_answer_id, name, is_true)
+            const lesson_answer = await lessonAnswerService.updateLessonAnswer(lesson_answer_id, name, right_answer)
 
             return res.json(lesson_answer)
         }catch (e) {
