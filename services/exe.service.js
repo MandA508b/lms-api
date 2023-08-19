@@ -1,13 +1,14 @@
 const Transaction = require('../models/transaction.model')
 const transactionService = require('./transaction.service')
-class transactionService{
+
+class exeService{
 
     async getPrice(){
         try{
             const transactions = await Transaction.find({kind: "deposit"})
             let sum = 0
             for(let key in transactions){
-                if(transaction[key].status !== 'completed' || transaction[ket].kind !== 'deposit')continue;
+                if(transactions[key].status !== 'completed' || transactions[key].kind !== 'deposit')continue;
                 sum+=transactions[key].usdt
             }
             return (0.5+Math.floor(sum/1000)*0.001)
@@ -34,4 +35,4 @@ class transactionService{
     }
 
 }
-module.exports = new transactionService()
+module.exports = new exeService()

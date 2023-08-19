@@ -1,7 +1,6 @@
 const Course_winner_payout = require('../models/course_winner_payout.model')
 const Course_iteration = require('../models/course_iteration.model')
 const Course_iteration_winner = require('../models/course_iteration_winner.model')
-const User_wallet = require('../models/user_wallet.model')
 const exeService = require('./exe.service')
 const transactionService = require('./transaction.service')
 

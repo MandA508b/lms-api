@@ -3,7 +3,6 @@ const Course_iteration = require('../models/course_iteration.model')
 const Course_iteration_winner = require('../models/course_iteration_winner.model')
 const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
-const User_wallet = require('../models/user_wallet.model')
 const exeService = require('./exe.service')
 const transactionService = require('./transaction.service')
 
