@@ -18,7 +18,7 @@ const schema = new db.Schema({
     },
     role: {
         type: String,
-        required: true //student, teacher, admin
+        required: true //student, author, admin
     },
     activationLink: {
         type: String

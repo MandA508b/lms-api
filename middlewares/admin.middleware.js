@@ -7,14 +7,7 @@ module.exports = (req, res, next) =>{
     }
     try{
         const token = req.headers.authorization
-        if(!token){
-            return next(ApiError.unauthorized('Користувач не авторизаваний'))
-        }
         const accessToken = token.split(' ')[1]
-        if(!accessToken){
-            return next(ApiError.unauthorized('Користувач не авторизаваний'))
-        }
-
         const userData = tokenService.validateAccessToken(accessToken)
         if(!userData){
             return next(ApiError.unauthorized('Користувач не авторизаваний'))
