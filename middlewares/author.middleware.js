@@ -13,7 +13,7 @@ module.exports = (req, res, next) =>{
             return next(ApiError.unauthorized('Користувач не авторизаваний'))
         }
 
-        if(userData.role !== 'author' || userData.role !== 'admin'){
+        if(userData.role !== 'author' && userData.role !== 'admin'){
             return next(ApiError.forbidden('Користувач не є автором'))
         }
 
