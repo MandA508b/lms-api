@@ -1,7 +1,6 @@
 const Course_iteration = require('../models/course_iteration.model')
 const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
-const courseService =require('./course.service')
 const courseWinnerPayoutService = require('./course_winner_payout.service')
 
 class courseIterationService{
@@ -74,7 +73,7 @@ class courseIterationService{
 
             for(let key in course_iterations){
                 if(course_iterations[key].start_at <= date && course_iterations[key].finish_at > date){
-                    const course = await courseService.findById(course_iterations[key].course_id)
+                    const course = await Course.findById(course_iterations[key].course_id)
                     relevant_course_iterations.push({course_iteration_id: course_iterations[key]._id, course})
                 }
             }
