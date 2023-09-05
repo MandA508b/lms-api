@@ -3,6 +3,7 @@ const User = require('../models/user.model')
 const Course = require('../models/course.model')
 const ApiError = require(`../errors/api.error`)
 const courseIterationService = require('./course_iteration.service')
+const transactionService = require('./transaction.service')
 const exeService = require('./exe.service')
 
 class courseRegistrationService{
@@ -18,7 +19,7 @@ class courseRegistrationService{
             }//checked!
 
             const course_iterations = await courseIterationService.actualIteration(course_id)
-            console.log({course_iterations})
+            // console.log({course_iterations})
             if(course_iterations.course_iteration !== null){
                 const candidate = await Course_registration.findOne({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
                 if(candidate!==null){
@@ -94,6 +95,33 @@ class courseRegistrationService{
             return {course_registration, next_course_registration}
         }catch (e) {
             console.log("error ", e)
+        }
+    }
+
+
+    async checkSolvency(user_id, course_id){
+        try {
+            const balance = await transactionService.countUserWallet(user_id)
+            const user = await User.findById(user_id)
+            const course = await Course.findById(course_id)
+            const exe_price = await exeService.getPrice()
+
+            if(course === null || !balance || user === null){//todo: does it work(!balance)?
+                throw ApiError.notFound()
+            }
+
+            if((balance.exe * exe_price + balance.usdt) >= (course.price + course.price / 10 * exe_price)){
+                return {status: true}
+            }
+            const price =  (course.price + course.price / 10 * exe_price) - (balance.exe * exe_price + balance.usdt)
+            const data = await transactionService.depositShortage(course, user, price, exe_price)
+            return {
+                status: false,
+                data
+            }
+
+        }catch (e) {
+            console.log("error: ", e)
         }
     }
 

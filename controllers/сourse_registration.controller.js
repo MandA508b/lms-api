@@ -1,5 +1,6 @@
 const ApiError = require(`../errors/api.error`)
 const courseRegistrationService = require('../services/course_registration.service')
+const courseService = require("../services/course.service");
 
 class courseRegistrationController{
 
@@ -44,6 +45,20 @@ class courseRegistrationController{
             return res.json(course_registrations)
         }catch (e) {
             console.log("error: ", e)
+        }
+    }
+
+    async checkSolvency(req ,res, next) {
+        try {
+            const {user_id, course_id} = req.body
+            if (!user_id || !course_id) {
+                return next(ApiError.badRequest())
+            }
+            const data = await courseRegistrationService.checkSolvency(user_id, course_id)
+
+            return res.json(data)
+        } catch (e) {
+            next(e)
         }
     }
 

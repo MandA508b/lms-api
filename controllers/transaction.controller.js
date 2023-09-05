@@ -5,7 +5,7 @@ class transactionController{//todo:
 
     async create(req,res,next) {
         try {
-            const {user_id, usdt, exe, kind} = req.body
+            let {user_id, usdt, exe, kind} = req.body
 
             if(!usdt)usdt=0
             if(!exe)exe=0
@@ -15,6 +15,21 @@ class transactionController{//todo:
             const transaction = await transactionService.create(user_id, usdt, exe, kind)
 
             return res.json(transaction)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    async callbackWayforpay(req,res,next) {
+        try {
+            const data = req.body;
+
+            if(!data) {
+                return next(ApiError.badRequest())
+            }
+            await transactionService.callbackWayforpay(data)
+
+            return res.status(200).send('OK');
         } catch (e) {
             next(e)
         }

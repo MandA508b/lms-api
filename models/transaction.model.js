@@ -1,6 +1,11 @@
 const db= require('../db/index')
 
 const schema = new db.Schema({
+    orderReference: {
+        type: String,
+        required: true,
+        unique: true
+    },
     user_id:{
         type: db.Schema.Types.ObjectId,
         required: true
@@ -17,7 +22,7 @@ const schema = new db.Schema({
         type: Number,
         required: true
     },
-    kind: {// 'deposit', 'withdraw' or 'swap'   
+    kind: {// 'deposit', 'withdraw', 'staking' or 'swap'
         type: String,
         required: true
     },
