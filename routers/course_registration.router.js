@@ -9,5 +9,6 @@ const student_middleware = require('../middlewares/student.middleware')
 router.post('/create', student_middleware, auth_middleware, courseRegistrationController.create)
 router.get('/findById', auth_middleware, courseRegistrationController.findById)
 router.get('/findByUser', student_middleware, auth_middleware, courseRegistrationController.findByUser)
+router.get('/checkSolvency', student_middleware, auth_middleware, courseRegistrationController.checkSolvency)
 
 module.exports = router
