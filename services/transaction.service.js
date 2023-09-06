@@ -116,12 +116,14 @@ class transactionService{
             }
             const balance = await this.countUserWallet(user_id)
             if(balance.usdt - Math.max(course_price/10*exe_price - balance.exe, 0) < 0){
+                throw ApiError.badRequest("недостатньо коштів!")
                 return false
             }
             if(Math.max(course_price/10*exe_price - balance.exe, 0)){
-                const transaction1 = await this.create(user_id, exe_price, Math.max(course_price/10*exe_price - balance.exe, 0), course_price, 'staking', 'completed')
+                const transaction1 = await this.create(user_id, exe_price, 0, -Math.max(course_price/10*exe_price - balance.exe, 0), 'swap', 'completed')
             }
-            const transaction2 = await this.create(user_id, exe_price, course_price/10, course_price, 'buy course', 'completed')
+            const transaction2 = await this.create(user_id, exe_price, -course_price/10, -course_price, 'staking', 'completed')
+            const transaction3 = await this.create(user_id, exe_price, -course_price/10, -course_price, 'buy course', 'completed')
             return true
         }catch (e) {
             console.log("error: ", e)
