@@ -23,6 +23,9 @@ class courseRegistrationService{
             }//checked!
 
             const buy_course = await transactionService.buyCourse(user_id, course.price, exe_price)
+            if(!buy_course){
+                throw ApiError.badRequest('не вдалось купити курс!')
+            }
             if(user === null || course === null || course.is_published === false){
                 throw ApiError.notFound('Користувача або курсу не знайдено!')
             }
