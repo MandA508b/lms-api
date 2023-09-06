@@ -1,12 +1,10 @@
 const Transaction = require('../models/transaction.model')
-const Course = require('../models/course.model')
-const User = require('../models/user.model')
-const exeService = require('./exe.service')
 const ApiError = require('../errors/api.error')
 const CryptoJS = require('crypto-js')
 const uuid = require('uuid')
 const jwt = require("jsonwebtoken")
-const courseRegistrationService = require('../services/course_registration.service')
+const User_info = require("../models/user_info.model")
+const exeService =require('./exe.service')
 
 class transactionService{
 
@@ -38,41 +36,10 @@ class transactionService{
 
             for(let key in transactions){
                 if(transactions[key].status!=='completed')continue;
-                exe+=transactions[key].exe
-                usdt+=transactions[key].usdt
+                exe+=transactions[key].exe_count
+                usdt+=transactions[key].usdt_count
             }
             return {exe, usdt}
-        }catch(e){
-            console.log("error: ", e)
-        }
-    }
-
-    async callbackWayforpay(data){
-        try{
-            if (data.transactionStatus === 'Approved') {
-                const user = User.findOne({email: data.email})
-                if(user===null){
-                    throw ApiError.notFound()
-                }
-                const exe_price = await exeService.getPrice()
-                const tokenData = jwt.verify(data.orderReference, process.env.SECRET_ACCESS_KEY)
-                const transaction = await Transaction.create({
-                    orderReference: data.orderReference,
-                    user_id: user._id,
-                    exe_price,
-                    exe_count: 0,
-                    usdt_count: data.amount,
-                    kind: "deposit",
-                    status: "completed"
-                })
-
-                const course_registration = await courseRegistrationService.create(tokenData.course_id, tokenData.user_id)
-
-                console.log('Платіж успішно здійснений:', data.orderReference);
-            } else {
-
-                console.log('Платіж неуспішний:', data.orderReference);
-            }
         }catch(e){
             console.log("error: ", e)
         }
@@ -81,14 +48,18 @@ class transactionService{
     async depositShortage(course, user, price, exe_price){
         try{
             const {merchantAccount, merchantDomainName, merchantSecretKey} = process.env
+            const user_info = await User_info.findOne({user_id: user._id})
+            if(user_info===null){
+                throw ApiError.badRequest('Заповінть профіль!')
+            }
             const orderDate = Math.floor(Date.now() / 1000); // Current timestamp in seconds
             const productName = [course.name];
             const productPrice = [price];
             const productCount = [1];
-            const clientFirstName = user.first_name;
-            const clientLastName = user.second_name;
+            const clientFirstName = user_info.first_name;
+            const clientLastName = user_info.second_name;
             const clientEmail = user.email;
-            const clientPhone = user.phone_number;
+            const clientPhone = user_info.phone_number;
             const language = 'US';
 
             const generateSignature = (orderReference) => {
@@ -132,7 +103,27 @@ class transactionService{
                 clientPhone,
                 language,
             }
+            return data
         }catch(e){
+            console.log("error: ", e)
+        }
+    }
+
+    async buyCourse(user_id, course_price, exe_price){
+        try{
+            if(!exe_price){
+                exe_price = await exeService.getPrice()
+            }
+            const balance = await this.countUserWallet(user_id)
+            if(balance.usdt - Math.max(course_price/10*exe_price - balance.exe, 0) < 0){
+                return false
+            }
+            if(Math.max(course_price/10*exe_price - balance.exe, 0)){
+                const transaction1 = await this.create(user_id, exe_price, Math.max(course_price/10*exe_price - balance.exe, 0), course_price, 'staking', 'completed')
+            }
+            const transaction2 = await this.create(user_id, exe_price, course_price/10, course_price, 'buy course', 'completed')
+            return true
+        }catch (e) {
             console.log("error: ", e)
         }
     }
