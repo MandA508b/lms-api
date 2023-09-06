@@ -8,5 +8,6 @@ const auth_middleware = require('../middlewares/auth.middleware')
 
 router.post('/create', auth_middleware, userInfoController.create)
 router.put('/update', auth_middleware, userInfoController.update)
+router.get('/findById', auth_middleware, userInfoController.findById)
 
 module.exports = router

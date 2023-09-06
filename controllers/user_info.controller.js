@@ -33,7 +33,7 @@ class userInfoController{
 
     async findById(req,res,next) {
         try {
-            const {user_id} = req.body
+            const {user_id} = req.query
             if(!user_id) {
                 return next(ApiError.badRequest())
             }
