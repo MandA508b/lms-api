@@ -118,7 +118,7 @@ class userController{
         try{
             const {user_id} = req.query
             if(!user_id){
-                return ApiError.badRequest()
+                return next(ApiError.badRequest())
             }
             const user_wallet = await transactionService.countUserWallet(user_id)
 

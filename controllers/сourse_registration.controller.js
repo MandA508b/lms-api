@@ -1,7 +1,5 @@
 const ApiError = require(`../errors/api.error`)
 const courseRegistrationService = require('../services/course_registration.service')
-const courseService = require("../services/course.service");
-
 class courseRegistrationController{
 
     async create(req,res,next) {
@@ -57,6 +55,21 @@ class courseRegistrationController{
             const data = await courseRegistrationService.checkSolvency(user_id, course_id)
 
             return res.json(data)
+        } catch (e) {
+            next(e)
+        }
+    }
+
+    async callbackWayforpay(req,res,next) {
+        try {
+            const data = req.body;
+
+            if(!data) {
+                return next(ApiError.badRequest())
+            }
+            await courseRegistrationService.callbackWayforpay(data)
+
+            return res.status(200).send('OK');
         } catch (e) {
             next(e)
         }

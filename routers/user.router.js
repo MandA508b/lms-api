@@ -12,7 +12,7 @@ router.post('/refresh', userController.refresh)
 router.get('/findAll', admin_middleware, auth_middleware, userController.findAll)
 router.get('/findById', userController.findById)
 router.get('/activate/:link', userController.activate)
-router.get('/countUserWallet', auth_middleware, userController.countUserWallet)
+router.get('/countUserWallet', userController.countUserWallet)//todo: auth
 router.post('/logout', userController.logout)
 
 module.exports = router

@@ -5,18 +5,27 @@ const ApiError = require(`../errors/api.error`)
 const courseIterationService = require('./course_iteration.service')
 const transactionService = require('./transaction.service')
 const exeService = require('./exe.service')
+const jwt = require("jsonwebtoken");
+const Transaction = require("../models/transaction.model");
 
 class courseRegistrationService{
 
-    async create(course_id, user_id) {
+    async create(course_id, user_id, exe_price) {
         try{
             const user = await User.findById(user_id)//checking for the relevance of the user
             const course = await Course.findById(course_id)//checking for the relevance of the course
-            const exe_price = await exeService.getPrice()
+            if(!exe_price){
+                const exe_price = await exeService.getPrice()
+            }
 
             if(user === null || course === null || course.is_published === false){
                 throw ApiError.notFound('Користувача або курсу не знайдено!')
             }//checked!
+
+            const buy_course = await transactionService.buyCourse(user_id, course.price, exe_price)
+            if(user === null || course === null || course.is_published === false){
+                throw ApiError.notFound('Користувача або курсу не знайдено!')
+            }
 
             const course_iterations = await courseIterationService.actualIteration(course_id)
             // console.log({course_iterations})
@@ -105,14 +114,13 @@ class courseRegistrationService{
             const user = await User.findById(user_id)
             const course = await Course.findById(course_id)
             const exe_price = await exeService.getPrice()
-
             if(course === null || !balance || user === null){//todo: does it work(!balance)?
                 throw ApiError.notFound()
             }
-
-            if((balance.exe * exe_price + balance.usdt) >= (course.price + course.price / 10 * exe_price)){
+            if((balance.exe * exe_price + balance.usdt) >= (course.price + course.price / 10 * exe_price)) {
                 return {status: true}
             }
+
             const price =  (course.price + course.price / 10 * exe_price) - (balance.exe * exe_price + balance.usdt)
             const data = await transactionService.depositShortage(course, user, price, exe_price)
             return {
@@ -121,6 +129,43 @@ class courseRegistrationService{
             }
 
         }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async callbackWayforpay(data){
+        try{
+            console.log(data)
+            if (data.transactionStatus === 'Approved') {
+                const user = User.findOne({email: data.email})
+                if(user===null){
+                    throw ApiError.notFound()
+                }
+                const tokenData = jwt.verify(data.orderReference, process.env.SECRET_ACCESS_KEY)
+                let exe_price = tokenData.exe_price
+
+                if(!exe_price){
+                    exe_price = await exeService.getPrice()
+                }
+
+                const transaction = await Transaction.create({
+                    orderReference: data.orderReference,
+                    user_id: user._id,
+                    exe_price,
+                    exe_count: 0,
+                    usdt_count: data.amount,
+                    kind: "deposit",
+                    status: "completed"
+                })
+
+                const course_registration = await this.create(tokenData.course_id, tokenData.user_id, exe_price)
+
+                console.log('Платіж успішно здійснений:', data.orderReference);
+            } else {
+
+                console.log('Платіж неуспішний:', data.orderReference);
+            }
+        }catch(e){
             console.log("error: ", e)
         }
     }

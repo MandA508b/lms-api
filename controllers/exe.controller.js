@@ -19,9 +19,9 @@ class exeController{
             if(!user_id || !amount){
                 return ApiError.badRequest()
             }
-            const transaction = await exeService.swap(user_id, amount)
+            // const transaction = await exeService.swap(user_id, amount)
             
-            return res.json(transaction)
+            // return res.json(transaction)
         }catch(e){
             next(e)
         }
