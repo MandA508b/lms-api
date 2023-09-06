@@ -31,6 +31,20 @@ class userInfoController{
         }
     }
 
+    async findById(req,res,next) {
+        try {
+            const {user_id} = req.body
+            if(!user_id) {
+                return next(ApiError.badRequest())
+            }
+            const user_info = await userInfoService.findById(user_id)
+
+            return res.json(user_info)
+        } catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new userInfoController()
