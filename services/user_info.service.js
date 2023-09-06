@@ -26,5 +26,15 @@ class userInfoService{
         }
     }
 
+    async findById(user_id) {
+        try{
+            const user_info = await User_info.findOne({user_id})
+
+            return user_info
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
 }
 module.exports = new userInfoService()
