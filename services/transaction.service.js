@@ -77,7 +77,6 @@ class transactionService{
                     ...productPrice,
                     ...productPrice,
                 ].join(';');
-                console.log({dataToSign})
                 return CryptoJS.HmacMD5(dataToSign, merchantSecretKey).toString(CryptoJS.enc.Hex);
             };
 
@@ -95,7 +94,7 @@ class transactionService{
                 merchantSignature: generateSignature(orderReference),
                 orderReference,
                 orderDate,
-                amount: 1,
+                amount: price,
                 currency: 'USD',
                 productName,
                 productPrice,
