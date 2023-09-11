@@ -71,10 +71,13 @@ class transactionService{
                     price,
                     'USD',
                     ...productName,
+                    ...productName,
+                    ...productCount,
                     ...productCount,
                     ...productPrice,
+                    ...productPrice,
                 ].join(';');
-
+                console.log({dataToSign})
                 return CryptoJS.HmacMD5(dataToSign, merchantSecretKey).toString(CryptoJS.enc.Hex);
             };
 
@@ -85,7 +88,7 @@ class transactionService{
                 exe_price,
                 unique_id
             }
-            const orderReference = jwt.sign(payload, process.env.SECRET_ACCESS_KEY, {expiresIn: '36500d'})
+            const orderReference = unique_id || jwt.sign(payload, process.env.SECRET_ACCESS_KEY, {expiresIn: '36500d'})
             const data = {
                 merchantAccount,
                 merchantDomainName,
