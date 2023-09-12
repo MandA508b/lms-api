@@ -45,14 +45,14 @@ class transactionService{
         }
     }
 
-    async depositShortage(course, user, price, exe_price){
-        try{
-            const {merchantAccount, merchantDomainName, merchantSecretKey} = process.env
-            const user_info = await User_info.findOne({user_id: user._id})
-            if(user_info===null){
-                throw ApiError.badRequest('Заповінть профіль!')
+    async depositShortage(course, user, price, exe_price) {
+        try {
+            const { merchantAccount, merchantDomainName, merchantSecretKey } = process.env;
+            const user_info = await User_info.findOne({ user_id: user._id });
+            if (user_info === null) {
+                throw ApiError.badRequest('Заповінть профіль!');
             }
-            const orderDate = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+            const orderDate = Math.floor(Date.now() / 1000); // Поточний час в секундах
             const productName = [course.name];
             const productPrice = [price];
             const productCount = [1];
@@ -69,33 +69,30 @@ class transactionService{
                     orderReference,
                     orderDate,
                     price,
-                    'USD',
-                    ...productName,
+                    'UAH', // Змініть на 'USD', якщо ви працюєте з доларами
                     ...productName,
                     ...productCount,
-                    ...productCount,
-                    ...productPrice,
                     ...productPrice,
                 ].join(';');
                 return CryptoJS.HmacMD5(dataToSign, merchantSecretKey).toString(CryptoJS.enc.Hex);
             };
 
-            const unique_id = uuid.v4()
+            const unique_id = uuid.v4();
             const payload = {
                 user_id: user._id,
                 course_id: course._id,
                 exe_price,
-                unique_id
+                unique_id,
             }
-            const orderReference = unique_id || jwt.sign(payload, process.env.SECRET_ACCESS_KEY, {expiresIn: '36500d'})
-            const data = {
+            const orderReference = unique_id || jwt.sign(payload, process.env.SECRET_ACCESS_KEY, { expiresIn: '36500d' });
+            return {
                 merchantAccount,
                 merchantDomainName,
                 merchantSignature: generateSignature(orderReference),
                 orderReference,
                 orderDate,
                 amount: price,
-                currency: 'USD',
+                currency: 'UAH', // Змініть на 'USD', якщо ви працюєте з доларами
                 productName,
                 productPrice,
                 productCount,
@@ -105,12 +102,10 @@ class transactionService{
                 clientPhone,
                 language,
             }
-            return data
-        }catch(e){
-            console.log("error: ", e)
+        } catch (e) {
+            console.log("Помилка: ", e);
         }
     }
-
     async buyCourse(user_id, course_price, exe_price){
         try{
             if(!exe_price){
