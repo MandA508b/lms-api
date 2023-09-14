@@ -9,11 +9,12 @@ class lessonController{
             const {data_} = req.body
             const data = JSON.parse(data_)
             const video = req.file
+            console.log({data})
             if(!data.course_id || !data.name || !data.description || !data.questions || !video || data.duration===undefined){
                 return next(ApiError.badRequest())
             }
             const full_lesson = await lessonService.createFullLesson(data, video)
-
+            console.log({full_lesson})
             return res.json(full_lesson)
         }catch (e) {
             next(e)
@@ -29,9 +30,9 @@ class lessonController{
             if(course_id===undefined || name===undefined || description===undefined || video === undefined || duration===undefined) {
                 return next(ApiError.badRequest())
             }
-
+            console.log({course_id, name, description, video, duration})
             const lesson = await lessonService.create(course_id, name, description, video, duration)
-
+            console.log(lesson)
             return res.json(lesson)
         } catch (e) {
             next(e)
