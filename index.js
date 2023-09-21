@@ -13,10 +13,11 @@ const PORT = process.env.PORT || 5001
 
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors({
-    credentials: true,
-    origin: ['http://localhost:5173','https://exellence.space']
-}))
+app.use(cors())
+// app.use(cors({
+//     credentials: true,
+//     origin: ['http://localhost:5173','https://exellence.space', 'https://www.exellence.space']
+// }))
 app.use(express.static(__dirname + '/src/videos'));
 app.use('/', router)
 app.use(fileUpload({
