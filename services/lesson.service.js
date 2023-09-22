@@ -29,6 +29,8 @@ class lessonService{
     }
     async testVideo(video){
         try{
+            console.log('test video service start')
+
             return video.filename
         }catch (e) {
             console.log("error: ", e)
