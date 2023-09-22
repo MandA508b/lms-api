@@ -23,12 +23,14 @@ class lessonController{
 
     async testVideo(req, res, next){
         try{
+            console.log('test video controller start')
             const video = req.file
 
             const savedVideo = await lessonService.testVideo(video)
             console.log({savedVideo})
             return res.json(savedVideo)
         }catch (e) {
+            console.log(' test video lesson.controller error', JSON.stringify({...e}, null, 4))
             next(e)
         }
     }
