@@ -21,6 +21,18 @@ class lessonController{
         }
     }
 
+    async testVideo(req, res, next){
+        try{
+            const video = req.file
+
+            const savedVideo = await lessonService.testVideo(video)
+            console.log({savedVideo})
+            return res.json(savedVideo)
+        }catch (e) {
+            next(e)
+        }
+    }
+
     async create(req,res,next) {
         try {
             const {course_id, name, description, duration} = req.body
