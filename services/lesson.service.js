@@ -27,6 +27,15 @@ class lessonService{
             console.log("error: ", e)
         }
     }
+    async testVideo(video){
+        try{
+            console.log('test video service start')
+
+            return video.filename
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
 
     async create(course_id, name, description, video, duration) {
         try{
