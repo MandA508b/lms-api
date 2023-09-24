@@ -188,6 +188,14 @@ class lessonService{
         }
     }
 
+    async updateDescription(lesson_id, description){
+        try {
+            return await Lesson.findByIdAndUpdate(lesson_id, {description})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
 }
 module.exports = new lessonService()
 

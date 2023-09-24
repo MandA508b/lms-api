@@ -26,12 +26,8 @@ class courseRegistrationService{
             if(!buy_course){
                 throw ApiError.badRequest('не вдалось купити курс!')
             }
-            if(user === null || course === null || course.is_published === false){
-                throw ApiError.notFound('Користувача або курсу не знайдено!')
-            }
 
             const course_iterations = await courseIterationService.actualIteration(course_id)
-            // console.log({course_iterations})
             if(course_iterations.course_iteration !== null){
                 const candidate = await Course_registration.findOne({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
                 if(candidate!==null){
@@ -117,7 +113,7 @@ class courseRegistrationService{
             const user = await User.findById(user_id)
             const course = await Course.findById(course_id)
             const exe_price = await exeService.getPrice()
-            if(course === null || !balance || user === null){//todo: does it work(!balance)?
+            if(course === null || !balance || user === null){
                 throw ApiError.notFound()
             }
             if((balance.exe * exe_price + balance.usdt) >= (course.price + course.price / 10 * exe_price)) {
@@ -136,9 +132,8 @@ class courseRegistrationService{
         }
     }
 
-    async callbackWayforpay(data){
+    async   callbackWayforpay(data){
         try{
-            console.log(data)
             if (data.transactionStatus === 'Approved') {
                 const user = User.findOne({email: data.email})
                 if(user===null){

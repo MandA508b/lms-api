@@ -137,6 +137,20 @@ class lessonController{
         }
     }
 
+    async updateDescription(req ,res, next) {
+        try {
+            const {lesson_id, description} = req.body
+            if (!lesson_id || !description) {
+                return next(ApiError.badRequest())
+            }
+            const course = await lessonService.updateDescription(lesson_id, description)
+
+            return res.json(course)
+        } catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new lessonController()

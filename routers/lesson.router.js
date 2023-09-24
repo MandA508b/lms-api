@@ -20,9 +20,10 @@ const upload = multer({ storage: storage })
 
 router.post('/create', author_middleware, auth_middleware, upload.single('video'), lessonController.create)
 router.post('/createFullLesson', author_middleware, auth_middleware, upload.single('video'), lessonController.createFullLesson)//todo:
-router.post('/testVideo', upload.single('video'), lessonController.testVideo)//todo: , upload.single('video')
+router.post('/testVideo', upload.single('video'), lessonController.testVideo)
 router.put('/updateNumberLesson', author_middleware, auth_middleware, lessonController.updateNumberLesson)
 router.put('/updateName', author_middleware, auth_middleware, lessonController.updateName)
+router.put('/updateDescription', author_middleware, auth_middleware, lessonController.updateDescription)
 router.get('/findAll', author_middleware, auth_middleware, lessonController.findAllByCourse)
 router.get('/findById', auth_middleware, lessonController.findById)
 router.get('/findActualLesson', student_middleware, auth_middleware, lessonController.findActualLesson)
