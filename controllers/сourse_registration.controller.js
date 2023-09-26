@@ -49,6 +49,7 @@ class courseRegistrationController{
     async checkSolvency(req ,res, next) {
         try {
             const {user_id, course_id} = req.query
+
             if (!user_id || !course_id) {
                 return next(ApiError.badRequest())
             }

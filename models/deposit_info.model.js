@@ -5,31 +5,23 @@ const schema = new db.Schema({
         type: db.Schema.Types.ObjectId,
         required: true
     },
-    exe_price: {
+    course_id:{
+        type: db.Schema.Types.ObjectId,
+        required: true
+    },
+    exe_price:{
         type: Number,
         required: true
     },
-    exe_count: {
-        type: Number,
-        required: true
-    },
-    usdt_count: {
-        type: Number,
-        required: true
-    },
-    kind: {// 'deposit', 'withdraw', 'staking' or 'swap'
+    unique_id: {
         type: String,
-        required: true
-    },
-    status: {
-        type: String,
-        required: true
+        required: true,
+        unique: true
     },
     created_at: {
         type: Number,
         default: () => new Date().getTime()
     }
-
 })
 
-module.exports = db.model('Transaction', schema)
+module.exports = db.model('Deposit_info', schema)
