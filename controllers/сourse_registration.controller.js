@@ -70,7 +70,7 @@ class courseRegistrationController{
             }
             await courseRegistrationService.callbackWayforpay(data)
 
-            return res.status(200).send('OK');
+            return res.redirect('https://exellence.space/mycourses');
         } catch (e) {
             next(e)
         }
