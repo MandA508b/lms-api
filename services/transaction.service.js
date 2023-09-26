@@ -4,14 +4,14 @@ const CryptoJS = require('crypto-js')
 const uuid = require('uuid')
 const jwt = require("jsonwebtoken")
 const User_info = require("../models/user_info.model")
-const exeService =require('./exe.service')
+const Transaction_info = require("../models/deposit_info.model")
 
 class transactionService{
 
     async create(user_id, exe_price, exe_count, usdt_count, kind, status){
         try{
-            const transaction = await Transaction.create({user_id, exe_price, exe_count, usdt_count, kind, status})
 
+            const transaction = await Transaction.create({user_id, exe_price, exe_count, usdt_count, kind, status})
             return transaction
         }catch (e) {
             console.log("error: ", e)
@@ -69,7 +69,7 @@ class transactionService{
                     orderReference,
                     orderDate,
                     price,
-                    'UAH', // Змініть на 'USD', якщо ви працюєте з доларами
+                    'USD', // Змініть на 'USD', якщо ви працюєте з доларами
                     ...productName,
                     ...productCount,
                     ...productPrice,
@@ -84,7 +84,9 @@ class transactionService{
                 exe_price,
                 unique_id,
             }
-            const orderReference = unique_id// || jwt.sign(payload, process.env.SECRET_ACCESS_KEY, { expiresIn: '36500d' });
+            const transaction_info = await Transaction_info.create({user_id: user._id, course_id: course._id, exe_price, unique_id})
+            const orderReference = unique_id
+
             return {
                 merchantAccount,
                 merchantDomainName,
@@ -92,7 +94,7 @@ class transactionService{
                 orderReference,
                 orderDate,
                 amount: price,
-                currency: 'UAH', // Змініть на 'USD', якщо ви працюєте з доларами
+                currency: 'USD', // Змініть на 'USD', якщо ви працюєте з доларами
                 productName,
                 productPrice,
                 productCount,
@@ -109,6 +111,7 @@ class transactionService{
     async buyCourse(user_id, course_price, exe_price){
         try{
             const balance = await this.countUserWallet(user_id)
+            console.log('hereee', balance.usdt , (Math.max(course_price/10*exe_price - balance.exe, 0) + course_price))
             if(balance.usdt - (Math.max(course_price/10*exe_price - balance.exe, 0) + course_price) < 0){
                 throw ApiError.badRequest("недостатньо коштів!")
                 return false
@@ -118,6 +121,7 @@ class transactionService{
             }
             const transaction2 = await this.create(user_id, exe_price, -course_price/10, 0, 'staking', 'completed')
             const transaction3 = await this.create(user_id, exe_price, 0, -course_price, 'buy course', 'completed')
+
             return true
         }catch (e) {
             console.log("error: ", e)
