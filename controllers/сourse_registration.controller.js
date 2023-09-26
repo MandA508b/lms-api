@@ -69,8 +69,9 @@ class courseRegistrationController{
                 return next(ApiError.badRequest())
             }
             await courseRegistrationService.callbackWayforpay(data)
-
+            res.redirect('https://exellence.space/mycourses');
             return res.redirect('https://exellence.space/mycourses');
+
         } catch (e) {
             next(e)
         }
