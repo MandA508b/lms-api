@@ -20,9 +20,9 @@ module.exports = (req, res, next) =>{
             return next(ApiError.unauthorized('Користувач не авторизаваний'))
         }
 
-        // if(userData.email && userData.isActivated !== true){
-        //     return next(ApiError.forbidden('Користувач не підтвердив пошту'))
-        // }
+        if(userData.email && userData.isActivated !== true){
+            return next(ApiError.forbidden('Користувач не підтвердив пошту'))
+        }
 
         req.user = userData
         next()
