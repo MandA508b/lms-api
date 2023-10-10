@@ -5,9 +5,7 @@ const ApiError = require(`../errors/api.error`)
 const courseIterationService = require('./course_iteration.service')
 const transactionService = require('./transaction.service')
 const exeService = require('./exe.service')
-const jwt = require("jsonwebtoken");
 const Transaction = require("../models/transaction.model");
-const crypto = require('crypto');
 const Deposit_info = require('../models/deposit_info.model')
 
 class courseRegistrationService{
@@ -26,12 +24,10 @@ class courseRegistrationService{
 
             const buy_course = await transactionService.buyCourse(user_id, course.price, exe_price)
             if(!buy_course){
-                console.log("here 0")
                 throw ApiError.badRequest('не вдалось купити курс!')
             }
             const course_iterations = await courseIterationService.actualIteration(course_id)
 
-            console.log({buy_course})
             if(course_iterations.course_iteration !== null){
                 const candidate = await Course_registration.findOne({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
                 if(candidate!==null){
@@ -40,7 +36,6 @@ class courseRegistrationService{
                 let date = new Date().getTime()
                 date = date - date % 86400000
                 const days_until_end = (course_iterations.course_iteration.finish_at - date)/86400000
-                console.log("here 1")
                 if(days_until_end >= course.lessons){//registration actual iteration
                     const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
                     course_iterations.course_iteration.participants = course_iterations.course_iteration.participants + 1
@@ -48,10 +43,7 @@ class courseRegistrationService{
                     return course_registration
                 }
             }
-            console.log("here 2")
             if(course_iterations.next_course_iteration === null){
-
-
                 throw ApiError.notFound('Ітерацію не знайдено!')
             }
             const next_candidate = await Course_registration.findOne({course_id, user_id, course_iteration_id: course_iterations.next_course_iteration._id})
@@ -63,7 +55,6 @@ class courseRegistrationService{
             const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.next_course_iteration._id})
             course_iterations.next_course_iteration.participants = course_iterations.next_course_iteration.participants + 1
             await course_iterations.next_course_iteration.save()
-            console.log({course_registration})
             return course_registration
         }catch (e) {
             console.log("error: ", e)

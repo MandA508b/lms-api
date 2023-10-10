@@ -5,14 +5,9 @@ class transactionController{
 
     async create(req,res,next) {
         try {
-            let {user_id, usdt, exe, kind} = req.body
+            let {user_id, exe_price, exe_count, usdt_count, kind, status} = req.body
 
-            if(!usdt)usdt=0
-            if(!exe)exe=0
-            if(!user_id || !kind || (!usdt && !exe)) {
-                return next(ApiError.badRequest())
-            }
-            const transaction = await transactionService.create(user_id, usdt, exe, kind)
+            const transaction = await transactionService.create(user_id, exe_price, exe_count, usdt_count, kind, status)
 
             return res.json(transaction)
         } catch (e) {
