@@ -3,11 +3,11 @@ const router = new Router()
 const fs = require('fs')
 const path = require('path')
 // const admin_middleware = require('../middlewares/admin.middleware')
-const auth_middleware = require('../middlewares/auth.middleware')
+// const auth_middleware = require('../middlewares/auth.middleware')
 // const author_middleware = require('../middlewares/author.middleware')
 // const student_middleware = require('../middlewares/student.middleware')
 
-router.get('/:id', auth_middleware, function(req, res, next) {
+router.get('/:id', function(req, res, next) {
     const videoId = req.params.id;
     const path_ = path.join(__dirname, `../src/videos/${videoId}`)
 
