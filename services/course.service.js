@@ -131,7 +131,7 @@ class courseService{
 
                 let actual_lesson = null
                 if(date >= course_iteration.start_at){
-                    const actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
+                    actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
                 }
 
                 courses.push({course, course_rating, passed_lessons, actual_lesson, course_iteration, language})
