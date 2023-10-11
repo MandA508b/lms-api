@@ -121,13 +121,19 @@ class courseService{
         try {
             const user_iterations = await Course_registration.find({user_id})
             let courses = []
+            const date = new Date().getTime()
             for (let key in user_iterations) {
                 const course = await Course.findById(user_iterations[key].course_id)
                 const language = await Language.findById(course.language_id)
                 const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
                 const course_rating = await CourseRating.findOne({course_id: user_iterations[key].course_id})
                 const passed_lessons = await lessonService.findAllPassedByCourse(user_iterations[key].course_iteration_id, user_id)
-                const actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
+
+                let actual_lesson = null
+                if(date >= course_iteration.start_at){
+                    const actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
+                }
+
                 courses.push({course, course_rating, passed_lessons, actual_lesson, course_iteration, language})
             }
 
