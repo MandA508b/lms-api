@@ -33,7 +33,6 @@ class courseService{
                 if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
 
                 const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
-
                 if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
                     if(course_iteration.course_iteration!==null){
                         courses_list.push({course: courses[key], registered: false, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})

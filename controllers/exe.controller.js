@@ -15,13 +15,13 @@ class exeController{
 
     async swap(req, res, next){
         try{
-            const {user_id, amount} = req.body
-            if(!user_id || !amount){
+            const {user_id} = req.body
+            if(!user_id){
                 return ApiError.badRequest()
             }
-            // const transaction = await exeService.swap(user_id, amount)
+            const transaction = await exeService.swap(user_id)
             
-            // return res.json(transaction)
+            return res.json(transaction)
         }catch(e){
             next(e)
         }

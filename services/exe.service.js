@@ -1,5 +1,5 @@
 const Transaction = require('../models/transaction.model')
-// const transactionService = require('./transaction.service')
+const transactionService = require('./transaction.service')
 
 class exeService{
 
@@ -17,22 +17,20 @@ class exeService{
         }
     }
 
-    // async swap(user_id, amount){
-    //     try{
-    //         const exe_price = this.getPrice()
-    //         const user_wallet = await transactionService.countUserWallet(user_id)
-    //
-    //         if(amount > user_wallet.exe){
-    //             throw(ApiError.badRequest())
-    //         }
-    //
-    //         const transaction = await transactionService.create({user_id, exe_price, exe_count: -amount, usdt_count: amount*exe_price, kind: "swap", status: "completed" })
-    //
-    //         return transaction
-    //     }catch (e) {
-    //         console.log("error: ", e)
-    //     }
-    // }
+    async swap(user_id){
+        try{
+            const exe_price = await this.getPrice()
+            const user_wallet = await transactionService.countUserWallet(user_id)
+
+            const amount = user_wallet.exe
+            const usdt_count = amount*exe_price
+                const transaction = await transactionService.create(user_id, exe_price, -amount, usdt_count, "swap", "completed" )
+
+            return transaction
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
 
 }
 module.exports = new exeService()
