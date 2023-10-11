@@ -13,7 +13,7 @@ router.put('/updateDescription', author_middleware, auth_middleware, courseContr
 router.get('/findAll', courseController.findAll)
 router.get('/findByAuthor', auth_middleware, courseController.findByAuthor)
 router.get('/findById', courseController.findById)
-router.get('/findUserCourses', auth_middleware, courseController.findUserCourses)
+router.get('/findUserCourses', courseController.findUserCourses)
 router.delete('/delete', author_middleware, auth_middleware, courseController.delete)
 
 module.exports = router
