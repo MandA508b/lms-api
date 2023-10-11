@@ -2,13 +2,12 @@ const Transaction = require('../models/transaction.model')
 const ApiError = require('../errors/api.error')
 const CryptoJS = require('crypto-js')
 const uuid = require('uuid')
-const jwt = require("jsonwebtoken")
 const User_info = require("../models/user_info.model")
 const Transaction_info = require("../models/deposit_info.model")
 
 class transactionService{
 
-    async create(user_id, exe_price, exe_count, usdt_count, kind, status){
+    async   create(user_id, exe_price, exe_count, usdt_count, kind, status){
         try{
 
             const transaction = await Transaction.create({user_id, exe_price, exe_count, usdt_count, kind, status})
