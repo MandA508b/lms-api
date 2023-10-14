@@ -24,7 +24,7 @@ class exeService{
 
             const amount = user_wallet.exe
             const usdt_count = amount*exe_price
-                const transaction = await transactionService.create(user_id, exe_price, -amount, usdt_count, "swap", "completed" )
+            const transaction = await transactionService.create(user_id, exe_price, -amount, usdt_count, "swap", "completed" )
 
             return transaction
         }catch (e) {

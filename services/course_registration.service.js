@@ -132,7 +132,7 @@ class courseRegistrationService{
 
     async   callbackWayforpay(data){
         try{
-            if (data.transactionStatus === 'Approved') {
+            if (true) {//data.transactionStatus === 'Approved'
                 const user = User.findOne({email: data.email})
                 if(user===null){
                     throw ApiError.notFound()
