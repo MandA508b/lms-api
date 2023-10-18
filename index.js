@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const errorHandlingMiddleware = require('./middlewares/error_handling.middleware')
 const courseIterationService = require('./services/course_iteration.service')
-const mongoose = require('mongoose')
+const Transaction = require('./models/transaction.model')
 
 const app = express();
 const PORT = process.env.PORT || 5001
@@ -32,7 +32,7 @@ function start(){
 
 start();
 
-let CronJob = require('cron').CronJob,//todo:
+let CronJob = require('cron').CronJob,
     job = new CronJob(// cron options + func
         '0 0 */1 * *',
         async function () {// function to add course iterations
@@ -42,4 +42,28 @@ let CronJob = require('cron').CronJob,//todo:
         true
     )
 
+// let CronJob2 = require('cron').CronJob,
+//     job2 = new CronJob(// cron options + func
+//         '*/10 * * * *',
+//         async function () {
+//
+//         },
+//         null,
+//         true
+//     )
+// let request = require('request');
+//
+// request.post(
+//     'https://api.wayforpay.com/api',
+//     { json: { "transactionType":"CHECK_STATUS",
+//             "merchantAccount": "www_spe_org_ua",
+//             "orderReference": "DH783023",
+//             "merchantSignature": "b95932786cbe243a76b014846b63fe92",
+//             "apiVersion": 1 } },
+//     function (error, response, body) {
+//         if (!error && response.statusCode == 200) {
+//             console.log(body);
+//         }
+//     }
+// );
 

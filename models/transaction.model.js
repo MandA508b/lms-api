@@ -1,6 +1,14 @@
 const db= require('../db/index')
 
 const schema = new db.Schema({
+    orderReference: {
+        type: String,
+        required: true
+    },
+    merchantSignature:{
+        type: String,
+        required: true
+    },
     user_id:{
         type: db.Schema.Types.ObjectId,
         required: true
