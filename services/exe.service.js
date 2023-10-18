@@ -23,6 +23,11 @@ class exeService{
             const user_wallet = await transactionService.countUserWallet(user_id)
 
             const amount = user_wallet.exe
+
+            if(amount === 0){
+                throw ApiError.badRequest()
+            }
+
             const usdt_count = amount*exe_price
             const transaction = await transactionService.create(user_id, exe_price, -amount, usdt_count, "swap", "completed" )
 

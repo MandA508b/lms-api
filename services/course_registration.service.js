@@ -132,34 +132,100 @@ class courseRegistrationService{
 
     async   callbackWayforpay(data){
         try{
-            if (true) {//data.transactionStatus === 'Approved'
-                const user = User.findOne({email: data.email})
+            console.log(data)
+
+            async function InProcessing(_data){
+                const user = User.findOne({email: _data.email})
                 if(user===null){
                     throw ApiError.notFound()
                 }
-                const deposit_info = await Deposit_info.findOne({unique_id: data.orderReference})
+                const deposit_info = await Deposit_info.findOne({unique_id: _data.orderReference})
 
                 const transaction = await Transaction.create({
                     orderReference: data.orderReference,
+                    merchantSignature: data.merchantSignature,
                     user_id: deposit_info.user_id,
                     exe_price: deposit_info.exe_price,
                     exe_count: 0,
                     usdt_count: data.amount,
                     kind: "deposit",
-                    status: "completed"
+                    status: "InProgress"
                 })
 
-                const course_registration = await this.create(deposit_info.course_id, deposit_info.user_id, deposit_info.exe_price)
-
-                console.log('Платіж успішно здійснений:', data.orderReference);
-            } else {
-
-                console.log('Платіж неуспішний:', data.orderReference);
+                console.log('Платіж розглядається:', _data.orderReference);
             }
+
+            const status = data.transactionStatus
+            switch (status){
+                case 'Approved':
+                    const user = User.findOne({email: data.email})
+                    if(user===null){
+                        throw ApiError.notFound()
+                    }
+                    const deposit_info = await Deposit_info.findOne({unique_id: data.orderReference})
+
+                    const transaction = await Transaction.create({
+                        orderReference: data.orderReference,
+                        merchantSignature: data.merchantSignature,
+                        user_id: deposit_info.user_id,
+                        exe_price: deposit_info.exe_price,
+                        exe_count: 0,
+                        usdt_count: data.amount,
+                        kind: "deposit",
+                        status: "completed"
+                    })
+
+                    const course_registration = await this.create(deposit_info.course_id, deposit_info.user_id, deposit_info.exe_price)
+
+                    console.log('Платіж успішно здійснений:', data.orderReference);
+                    break;
+                case 'InProcessing':
+                    await InProcessing(data)
+                    break;
+                case 'Pending':
+                    await InProcessing(data)
+                    break;
+                default:
+                    console.log('Платіж неуспішний:', data.orderReference);
+
+            }
+
+
+
+
         }catch(e){
             console.log("error: ", e)
         }
     }
 
+    async checkProgressTransaction(){
+        try{
+            const transactions = await Transaction.find({status: 'InProgress'})
+            for (let key in transactions) {
+                const response = await fetch("https://reqbin.com/echo/post/json", {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: `{
+                       "Id": 78912,
+                       "Customer": "Jason Sweet",
+                       "Quantity": 1,
+                       "Price": 18.00
+                      }`,
+                });
+                response.json().then(data => {
+                    console.log(JSON.stringify(data));
+                });
+                try{
+                }catch (e) {
+                }
+            }
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+    
 }
 module.exports = new courseRegistrationService()
