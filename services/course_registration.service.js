@@ -149,7 +149,7 @@ class courseRegistrationService{
                     exe_count: 0,
                     usdt_count: data.amount,
                     kind: "deposit",
-                    status: "InProgress"
+                    status: "completed"
                 })
 
                 console.log('Платіж розглядається:', _data.orderReference);
