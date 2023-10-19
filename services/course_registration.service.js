@@ -162,28 +162,34 @@ class courseRegistrationService{
                     if(user===null){
                         throw ApiError.notFound()
                     }
-                    const deposit_info = await Deposit_info.findOne({unique_id: data.orderReference})
+                    const deposit_info1 = await Deposit_info.findOne({unique_id: data.orderReference})
 
                     const transaction = await Transaction.create({
                         orderReference: data.orderReference,
                         merchantSignature: data.merchantSignature,
-                        user_id: deposit_info.user_id,
-                        exe_price: deposit_info.exe_price,
+                        user_id: deposit_info1.user_id,
+                        exe_price: deposit_info1.exe_price,
                         exe_count: 0,
                         usdt_count: data.amount,
                         kind: "deposit",
                         status: "completed"
                     })
 
-                    const course_registration = await this.create(deposit_info.course_id, deposit_info.user_id, deposit_info.exe_price)
+                    const course_registration1 = await this.create(deposit_info1.course_id, deposit_info1.user_id, deposit_info1.exe_price)
 
                     console.log('Платіж успішно здійснений:', data.orderReference);
                     break;
                 case 'InProcessing':
                     await InProcessing(data)
+                    const deposit_info2 = await Deposit_info.findOne({unique_id: data.orderReference})
+                    const course_registration2 = await this.create(deposit_info2.course_id, deposit_info2.user_id, deposit_info2.exe_price)
+
                     break;
                 case 'Pending':
                     await InProcessing(data)
+                    const deposit_info3 = await Deposit_info.findOne({unique_id: data.orderReference})
+                    const course_registration3 = await this.create(deposit_info3.course_id, deposit_info3.user_id, deposit_info3.exe_price)
+
                     break;
                 default:
                     console.log('Платіж неуспішний:', data.orderReference);
