@@ -126,6 +126,16 @@ class courseController{
         }
     }
 
+    async coursesStatistics(req ,res, next) {
+        try {
+            const courses_statistic = await courseService.coursesStatistics()
+
+            return res.json(courses_statistic)
+        } catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new courseController()

@@ -4,6 +4,8 @@ const lessonService = require('./lesson.service')
 const CourseRating = require('../models/course_rating.model')
 const Course_iteration = require('../models/course_iteration.model')
 const Course_registration = require('../models/course_registration.model')
+const User_answer = require('../models/user_answer.model')
+const User = require('../models/user.model')
 const courseRegistrationService = require('../services/course_registration.service')
 const courseIterationService = require('./course_iteration.service')
 const Language = require('../models/language.model')
@@ -169,6 +171,41 @@ class courseService{
     async updateDescription(course_id, description){
         try {
             return await Course.findByIdAndUpdate(course_id, {description})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async coursesStatistics(){
+        try {
+            const courses = await Course.find({is_published: true})
+            let courses_statistic = []
+            for (let key in courses) {
+                const actual_iteration = await courseIterationService.actualIteration(courses[key]._id)
+                if(actual_iteration.course_iteration===null){
+                    courses_statistic.push({courseName: courses[key].name})
+                    continue
+                }
+                const actual_registrations = await Course_registration.find({course_iteration_id: actual_iteration.course_iteration._id})
+                let users = []
+                for(let a_r_key in actual_registrations){
+                    const user = await User.findById(actual_registrations[a_r_key].user_id)
+                    users.push(user.email)
+                }
+                const lessons = await Lesson.find({course_id: courses[key]._id})
+                let lessonsData = []
+                for(let lessons_key in lessons){
+                    const user_answers = await User_answer.find({course_iteration_id: actual_iteration.course_iteration._id, lesson_id: lessons[lessons_key]._id}).sort({user_id: 1})
+                    let lessons_users = []
+                    for (let u_a_key in user_answers) {
+                        const user = await User.findById(user_answers[u_a_key].user_id)
+                        lessons_users.push({user: user.email, user_answer: {is_correct: user_answers[u_a_key].is_correct, in_time: user_answers[key].in_time, attempt: user_answers[key].attempt}})
+                    }
+                    lessonsData.push({lesson: lessons[lessons_key].name, users: lessons_users})
+                }
+                courses_statistic.push({courseName: courses[key].name, users, lessonsData})
+                return courses_statistic
+            }
         }catch (e) {
             console.log("error: ", e)
         }
