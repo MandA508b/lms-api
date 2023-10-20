@@ -183,12 +183,11 @@ class courseService{
             for (let key in courses) {
                 const actual_iteration = await courseIterationService.actualIteration(courses[key]._id)
                 if(actual_iteration.course_iteration===null){
-                    courses_statistic.push({courseName: courses[key].name})
                     continue
                 }
                 const actual_registrations = await Course_registration.find({course_iteration_id: actual_iteration.course_iteration._id})
                 let users = []
-                for(let a_r_key in actual_registrations){
+                for(let a_r_key in actual_registrations){ 
                     const user = await User.findById(actual_registrations[a_r_key].user_id)
                     users.push(user.email)
                 }
@@ -204,8 +203,8 @@ class courseService{
                     lessonsData.push({lesson: lessons[lessons_key].name, users: lessons_users})
                 }
                 courses_statistic.push({courseName: courses[key].name, users, lessonsData})
-                return courses_statistic
             }
+            return courses_statistic
         }catch (e) {
             console.log("error: ", e)
         }
