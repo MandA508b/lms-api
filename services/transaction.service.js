@@ -110,7 +110,6 @@ class transactionService{
     async buyCourse(user_id, course_price, exe_price){
         try{
             const balance = await this.countUserWallet(user_id)
-            console.log('hereee', balance.usdt , (Math.max(course_price/10*exe_price - balance.exe, 0) + course_price))
             if(balance.usdt - (Math.max(course_price/10*exe_price - balance.exe, 0) + course_price) < 0){
                 throw ApiError.badRequest("недостатньо коштів!")
                 return false
