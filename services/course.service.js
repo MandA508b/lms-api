@@ -10,6 +10,7 @@ const courseRegistrationService = require('../services/course_registration.servi
 const courseIterationService = require('./course_iteration.service')
 const Language = require('../models/language.model')
 const ApiError = require(`../errors/api.error`)
+const {fnAddWatermark} = require("ffmpeg/lib/video");
 
 class courseService{
 
@@ -23,9 +24,109 @@ class courseService{
         }
     }
 
-    async findAll(user_id) {
+    async findAll(user_id, filter) {
         try{
-            const courses = await Course.find({is_published: true})
+            async function compareParticipants(a, b) {
+                if(a===b)return 0
+
+                const course_iteration_a = await courseIterationService.actualIteration(a._id)
+                const course_iteration_b = await courseIterationService.actualIteration(b._id)
+
+                a = course_iteration_a.course_iteration
+                b = course_iteration_b.course_iteration
+                if(a===null)a=course_iteration_a.next_course_iteration
+                if(b===null)b=course_iteration_b.next_course_iteration
+
+                if (a.participants < b.participants) {
+                    return 1;
+                } else if (a.participants >= b.participants) {
+                    return -1;
+                }
+                return 0;
+            }
+            async function compareRating(a, b) {
+                if(a===b)return 0
+
+                const course_rating_a = await CourseRating.findOne({course_id: a._id})
+                const course_rating_b = await CourseRating.findOne({course_id: b._id})
+                if (course_rating_a.rating < course_rating_b.rating) {
+                    return -1;
+                } else if (course_rating_a.rating >= course_rating_b.rating) {
+                    return 1;
+                }
+                return 0;
+            }
+            function comparePrice(a, b) {
+                if(a===b)return 0
+                if (a.price < b.price) {
+                    return -1;
+                } else if (a.price >= b.price) {
+                    return 1;
+                }
+                return 0;
+            }
+            async function compareBank(a, b) {
+                if(a===b)return 0
+                const course_iteration_a = await courseIterationService.actualIteration(a._id)
+                const course_iteration_b = await courseIterationService.actualIteration(b._id)
+
+                let a_it = course_iteration_a.course_iteration
+                let b_it = course_iteration_b.course_iteration
+
+                if(a_it===null)a_it=course_iteration_a.next_course_iteration
+                if(b_it===null)b_it=course_iteration_b.next_course_iteration
+                // console.log(a_it.participants*a.price, b_it.participants*b.price)
+                if (a_it.participants*a.price < b_it.participants*b.price) {
+                    return -1;
+                } else if (a_it.participants*a.price >= b_it.participants*b.price) {
+                    return 1;
+                }
+                return 0;
+            }
+
+            async function sort(array, compareFn) {
+                // Якщо масив має менше двох елементів, він вже відсортований.
+                if (array.length < 2) {
+                    return array;
+                }
+
+                // Вибираємо опорний елемент.
+                const pivot = array[Math.floor(array.length / 2)];
+
+                // Розбиваємо масив на два підмасиви: елементи, менші за опорний елемент, та елементи, більші за опорний елемент.
+                const smaller = [];
+                const larger = [];
+                for (const element of array) {
+                    if (await compareFn(element, pivot) < 0) {
+                        smaller.push(element);
+                    } else if (await compareFn(element, pivot) > 0) {
+                        larger.push(element);
+                    }
+                }
+
+                // Виконуємо сортування для кожного підмасиву рекурсивно.
+                return (await sort(smaller, compareFn)).concat([pivot], await sort(larger, compareFn));
+            }
+
+            let courses = await Course.find({is_published: true});
+
+
+            switch (filter){//filter: participants, rating, price, bank
+                case 'participants':
+                    courses = await sort(courses, compareParticipants)
+                    break;
+                case 'rating':
+                    courses = await sort(courses, compareRating)
+                    break;
+                case 'price':
+                    courses = await sort(courses, comparePrice)
+                    break;
+                case 'bank':
+                    courses = await sort(courses, compareBank)
+                    break;
+                default:
+                    break;
+            }
             let courses_list = []
             for (let key in courses) {
                 const course_rating = await CourseRating.findOne({course_id: courses[key]._id})
@@ -39,8 +140,8 @@ class courseService{
                     if(course_iteration.course_iteration!==null){
                         courses_list.push({course: courses[key], registered: false, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
                     }else{
-                            courses_list.push({course: courses[key], registered: false, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
-                        }
+                        courses_list.push({course: courses[key], registered: false, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                    }
                     continue;
                 }
                 let actual_lesson = null
@@ -48,8 +149,8 @@ class courseService{
                     actual_lesson = await lessonService.findActualLesson(courses[key]._id, course_iteration.course_iteration._id, user_id)
                 }
                 if(course_iteration.course_iteration!==null){
-                courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
-                    }else{
+                    courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
+                }else{
                     courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
                 }
             }
@@ -73,7 +174,7 @@ class courseService{
                 if(course_iteration.course_iteration!==null){
                     const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration.course_iteration._id)
                     courses_list.push({course: courses[key], participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.course_iteration, language})
-                    }else{
+                }else{
                     const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration.next_course_iteration._id)
                     courses_list.push({course: courses[key], participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.next_course_iteration, language})
                 }
@@ -187,7 +288,7 @@ class courseService{
                 }
                 const actual_registrations = await Course_registration.find({course_iteration_id: actual_iteration.course_iteration._id})
                 let users = []
-                for(let a_r_key in actual_registrations){ 
+                for(let a_r_key in actual_registrations){
                     const user = await User.findById(actual_registrations[a_r_key].user_id)
                     users.push(user.email)
                 }
