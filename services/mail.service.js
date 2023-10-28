@@ -20,7 +20,7 @@ class mailService{
             text: `Welcome to Exellence.space 
  Please, follow the link below to activate Your account:  ${link}. 
  Note: if the link doesn't work, just copy and paste the URL in Your browser window.
- Your credentials are:  Login: ${to}  Password: ….. 
+ Your credentials are:  Login: ${to} . 
 Lets go to platform 
  
 We are glad to see you in our community. Feel free to contact us in any cases. Let's make more study together. 
