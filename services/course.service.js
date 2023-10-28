@@ -130,29 +130,33 @@ class courseService{
             }
             let courses_list = []
             for (let key in courses) {
-                const course_rating = await CourseRating.findOne({course_id: courses[key]._id})
-                const language = await Language.findById(courses[key].language_id)
-                const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
+                try{
+                    const course_rating = await CourseRating.findOne({course_id: courses[key]._id})
+                    const language = await Language.findById(courses[key].language_id)
+                    const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
 
-                if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
+                    if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
 
-                const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
-                if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
-                    if(course_iteration.course_iteration!==null){
-                        courses_list.push({course: courses[key], registered: false, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
-                    }else{
-                        courses_list.push({course: courses[key], registered: false, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                    const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
+                    if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
+                        if(course_iteration.course_iteration!==null){
+                            courses_list.push({course: courses[key], registered: false, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
+                        }else{
+                            courses_list.push({course: courses[key], registered: false, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                        }
+                        continue;
                     }
-                    continue;
-                }
-                let actual_lesson = null
-                if(actual_registration.course_registration!==null) {
-                    actual_lesson = await lessonService.findActualLesson(courses[key]._id, course_iteration.course_iteration._id, user_id)
-                }
-                if(course_iteration.course_iteration!==null){
-                    courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
-                }else{
-                    courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                    let actual_lesson = null
+                    if(actual_registration.course_registration!==null) {
+                        actual_lesson = await lessonService.findActualLesson(courses[key]._id, course_iteration.course_iteration._id, user_id)
+                    }
+                    if(course_iteration.course_iteration!==null){
+                        courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
+                    }else{
+                        courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                    }
+                }catch (e) {
+
                 }
             }
 
