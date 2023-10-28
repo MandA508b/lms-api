@@ -87,6 +87,7 @@ class transactionService{
             const orderReference = unique_id
 
             return {
+                paymentSystems:'card',
                 merchantAccount,
                 merchantDomainName,
                 merchantSignature: generateSignature(orderReference),
