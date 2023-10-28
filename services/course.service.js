@@ -11,6 +11,7 @@ const courseIterationService = require('./course_iteration.service')
 const Language = require('../models/language.model')
 const ApiError = require(`../errors/api.error`)
 const {fnAddWatermark} = require("ffmpeg/lib/video");
+const {cache} = require("express/lib/application");
 
 class courseService{
 
@@ -225,18 +226,22 @@ class courseService{
             let courses = []
             const date = new Date().getTime()
             for (let key in user_iterations) {
-                const course = await Course.findById(user_iterations[key].course_id)
-                const language = await Language.findById(course.language_id)
-                const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
-                const course_rating = await CourseRating.findOne({course_id: user_iterations[key].course_id})
-                const passed_lessons = await lessonService.findAllPassedByCourse(user_iterations[key].course_iteration_id, user_id)
+                try{
+                    const course = await Course.findById(user_iterations[key].course_id)
+                    const language = await Language.findById(course.language_id)
+                    const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
+                    const course_rating = await CourseRating.findOne({course_id: user_iterations[key].course_id})
+                    const passed_lessons = await lessonService.findAllPassedByCourse(user_iterations[key].course_iteration_id, user_id)
 
-                let actual_lesson = null
-                if(date >= course_iteration.start_at){
-                    actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
+                    let actual_lesson = null
+                    if(date >= course_iteration.start_at){
+                        actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
+                    }
+
+                    courses.push({course, course_rating, passed_lessons, actual_lesson, course_iteration, language})
+                }catch (e) {
+                    
                 }
-
-                courses.push({course, course_rating, passed_lessons, actual_lesson, course_iteration, language})
             }
 
             return courses
