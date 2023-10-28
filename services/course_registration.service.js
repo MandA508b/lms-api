@@ -23,9 +23,11 @@ class courseRegistrationService{
             }//checked!
 
             const buy_course = await transactionService.buyCourse(user_id, course.price, exe_price)
+            console.log({buy_course})
             if(!buy_course){
-                throw ApiError.badRequest('не вдалось купити курс!')
+                throw ApiError.badRequest('недостатньо коштів!')
             }
+            console.log("skipped")
             const course_iterations = await courseIterationService.actualIteration(course_id)
 
             if(course_iterations.course_iteration !== null){
@@ -114,11 +116,11 @@ class courseRegistrationService{
             if(course === null || !balance || user === null){
                 throw ApiError.notFound()
             }
-            if((balance.exe * exe_price + balance.usdt) >= (course.price + course.price / 10 * exe_price)) {
+            if((balance.exe * exe_price + balance.usdt) >= (course.price + (course.price / 10 * exe_price))) {
                 return {status: true}
             }
 
-            const price =  (course.price + course.price / 10 * exe_price) - (balance.exe * exe_price + balance.usdt)
+            const price =  (course.price + (course.price / 10 * exe_price)) - (balance.exe * exe_price + balance.usdt)
             const data = await transactionService.depositShortage(course, user, price, exe_price)
             return {
                 status: false,
