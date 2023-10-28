@@ -20,7 +20,7 @@ class userAnswerService{
             const date = new Date().getTime()
 
             const candidate = await User_answer.findOne({user_id, course_iteration_id, lesson_id})
-            if(candidate){
+            if(candidate!==null){
                 candidate.is_correct = is_correct
                 candidate.attempt = candidate.attempt + 1
                 candidate.in_time = in_time
@@ -30,7 +30,7 @@ class userAnswerService{
 
             const course = await Course.findById(course_iteration.course_id)
             const user_answers = await User_answer.find({user_id, course_iteration_id}).sort({created_at: -1})
-            if(user_answers.length===0 || (user_answers.length>0 && (date - date%86400000)-(user_answers[0].created_at-user_answers[0].created_at%86400000)<86400000*2)){
+            if(user_answers.length===0 || (user_answers.length>0 && user_answers[0].in_time && ((date - date%86400000)-(user_answers[0].created_at-user_answers[0].created_at%86400000))===86400000)){
                 in_time = true
 
                 if((user_answers.length === course.lessons - 1) && is_correct){
