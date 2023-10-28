@@ -307,8 +307,10 @@ class courseService{
                     const user_answers = await User_answer.find({course_iteration_id: actual_iteration.course_iteration._id, lesson_id: lessons[lessons_key]._id}).sort({user_id: 1})
                     let lessons_users = []
                     for (let u_a_key in user_answers) {
-                        const user = await User.findById(user_answers[u_a_key].user_id)
-                        lessons_users.push({user: user.email, user_answer: {is_correct: user_answers[u_a_key].is_correct, in_time: user_answers[key].in_time, attempt: user_answers[key].attempt}})
+                      try{
+                          const user = await User.findById(user_answers[u_a_key].user_id)
+                          lessons_users.push({user: user.email, user_answer: {is_correct: user_answers[u_a_key].is_correct, in_time: user_answers[key].in_time, attempt: user_answers[key].attempt}})
+                      }catch (e) {}
                     }
                     lessonsData.push({lesson: lessons[lessons_key].name, users: lessons_users})
                 }

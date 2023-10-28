@@ -3,11 +3,11 @@ const db= require('../db/index')
 const schema = new db.Schema({
     orderReference: {
         type: String,
-        required: true
+        required: false
     },
     merchantSignature:{
         type: String,
-        required: true
+        required: false
     },
     user_id:{
         type: db.Schema.Types.ObjectId,
