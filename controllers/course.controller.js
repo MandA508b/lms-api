@@ -19,8 +19,11 @@ class courseController{
 
     async findAll(req,res,next){
         try{
-            const {user_id, filter} = req.query
-            const courses = await courseService.findAll(user_id, filter)
+            let {user_id, filter, type_filter} = req.query
+            if(!type_filter) {
+                type_filter = 1
+            }
+            const courses = await courseService.findAll(user_id, filter, type_filter)
 
             return res.json(courses)
         }catch (e) {
