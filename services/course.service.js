@@ -25,7 +25,7 @@ class courseService{
         }
     }
 
-    async findAll(user_id, filter) {
+    async findAll(user_id, filter, type_filter) {
         try{
             async function compareParticipants(a, b) {
                 if(a===b)return 0
@@ -39,9 +39,9 @@ class courseService{
                 if(b===null)b=course_iteration_b.next_course_iteration
 
                 if (a.participants < b.participants) {
-                    return 1;
+                    return type_filter;
                 } else if (a.participants >= b.participants) {
-                    return -1;
+                    return -type_filter;
                 }
                 return 0;
             }
@@ -51,18 +51,18 @@ class courseService{
                 const course_rating_a = await CourseRating.findOne({course_id: a._id})
                 const course_rating_b = await CourseRating.findOne({course_id: b._id})
                 if (course_rating_a.rating < course_rating_b.rating) {
-                    return -1;
+                    return type_filter;
                 } else if (course_rating_a.rating >= course_rating_b.rating) {
-                    return 1;
+                    return -type_filter;
                 }
                 return 0;
             }
             function comparePrice(a, b) {
                 if(a===b)return 0
                 if (a.price < b.price) {
-                    return -1;
+                    return type_filter;
                 } else if (a.price >= b.price) {
-                    return 1;
+                    return -type_filter;
                 }
                 return 0;
             }
@@ -78,9 +78,9 @@ class courseService{
                 if(b_it===null)b_it=course_iteration_b.next_course_iteration
                 // console.log(a_it.participants*a.price, b_it.participants*b.price)
                 if (a_it.participants*a.price < b_it.participants*b.price) {
-                    return -1;
+                    return type_filter;
                 } else if (a_it.participants*a.price >= b_it.participants*b.price) {
-                    return 1;
+                    return -type_filter;
                 }
                 return 0;
             }
