@@ -5,15 +5,47 @@ const User_answer = require('../models/user_answer.model')
 const Course = require('../models/course.model')
 const lessonQuestionService = require('./lesson_question.service')
 const ApiError = require(`../errors/api.error`)
-
+const AWS = require('aws-sdk')
+let crypto = require('crypto')
 class lessonService{
 
+    async uploadVideo(video, video_name){
+        try{
+            const s3 = new AWS.S3({
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                region: process.env.AWS_region
+            })
+
+            const bucketName = 'es-video';
+            const newFileNameKey= `video/${video_name}`
+
+            const params = {
+                Bucket: bucketName,
+                Key: newFileNameKey,
+                Body: video.buffer,
+            };
+
+            return await s3.putObject(params, (err, data) => {
+                if (err) {
+                    console.log("error: ", err)
+                    throw ApiError.internal('Problem with upload video!')
+                } else {
+                    console.log("success: ")
+                }
+            }).promise()
+        }catch (e) {
+            console.log("Error: ", e)
+        }
+    }
     async createFullLesson(data, video){
         try{
-
+            let video_name = crypto.randomBytes(30).toString('hex') + '.mp4'
+            await this.uploadVideo(video, video_name)
+            video_name = process.env.AWS_BUACKET_URL + 'video/' + video_name
             let created_at = new Date().getTime()
             const course = await Course.findById(data.course_id)
-            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name: video.filename, created_at, video_duration: data.duration, number: course.lessons + 1})
+            const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name, created_at, video_duration: data.duration, number: course.lessons + 1})
             const lesson_rating = await LessonRating.create({lesson_id: lesson._id, course_id: data.course_id})
             course.lessons = course.lessons + 1
             await course.save()
@@ -39,10 +71,13 @@ class lessonService{
 
     async create(course_id, name, description, video, duration) {
         try{
+            let video_name = crypto.randomBytes(30).toString('hex') + '.mp4'
+            await this.uploadVideo(video, video_name)
+            video_name = process.env.AWS_BUACKET_URL + 'video/' + video_name
 
             const course = await Course.findById(course_id)
             let created_at = new Date().getTime()
-            const lesson =  await Lesson.create({course_id, name, description, video_name: video.filename, created_at, video_duration: duration, number: course.lessons + 1})
+            const lesson =  await Lesson.create({course_id, name, description, video_name, created_at, video_duration: duration, number: course.lessons + 1})
             course.lessons = course.lessons + 1
             await course.save()
             return lesson
