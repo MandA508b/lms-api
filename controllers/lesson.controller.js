@@ -9,11 +9,11 @@ class lessonController{
             const {data_} = req.body
             const data = JSON.parse(data_)
             const video = req.file
+            console.log(data.course_id ,data.name,data.description,data.questions ,video , data.duration)
             if(!data.course_id || !data.name || !data.description || !data.questions || !video || data.duration===undefined){
                 return next(ApiError.badRequest())
             }
             const full_lesson = await lessonService.createFullLesson(data, video)
-            console.log({full_lesson})
             return res.json(full_lesson)
         }catch (e) {
             next(e)
