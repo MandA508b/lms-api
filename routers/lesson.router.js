@@ -9,17 +9,11 @@ const auth_middleware = require('../middlewares/auth.middleware')
 const author_middleware = require('../middlewares/author.middleware')
 const student_middleware = require('../middlewares/student.middleware')
 
-const storage = multer.diskStorage({
-    destination: path.join(__dirname, `../src/videos`),
-    filename: function (req, file, cb) {
-        cb(null, crypto.randomBytes(30).toString('hex') + '.mp4')
-    }
-})
+const upload = multer()
 
-const upload = multer({ storage: storage })
 
 router.post('/create', author_middleware, auth_middleware, upload.single('video'), lessonController.create)
-router.post('/createFullLesson', author_middleware, auth_middleware, upload.single('video'), lessonController.createFullLesson)//todo:
+router.post('/createFullLesson', author_middleware, auth_middleware, upload.single('video'), lessonController.createFullLesson)
 router.post('/testVideo', upload.single('video'), lessonController.testVideo)
 router.put('/updateNumberLesson', author_middleware, auth_middleware, lessonController.updateNumberLesson)
 router.put('/updateName', author_middleware, auth_middleware, lessonController.updateName)

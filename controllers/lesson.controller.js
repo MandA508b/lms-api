@@ -9,7 +9,6 @@ class lessonController{
             const {data_} = req.body
             const data = JSON.parse(data_)
             const video = req.file
-            console.log({data})
             if(!data.course_id || !data.name || !data.description || !data.questions || !video || data.duration===undefined){
                 return next(ApiError.badRequest())
             }
@@ -27,7 +26,6 @@ class lessonController{
             const video = req.file
 
             const savedVideo = await lessonService.testVideo(video)
-            console.log({savedVideo})
             return res.json(savedVideo)
         }catch (e) {
             console.log(' test video lesson.controller error', JSON.stringify({...e}, null, 4))
@@ -40,13 +38,10 @@ class lessonController{
             const {course_id, name, description, duration} = req.body
 
             const video = req.file
-
             if(course_id===undefined || name===undefined || description===undefined || video === undefined || duration===undefined) {
                 return next(ApiError.badRequest())
             }
-            console.log({course_id, name, description, video, duration})
             const lesson = await lessonService.create(course_id, name, description, video, duration)
-            console.log(lesson)
             return res.json(lesson)
         } catch (e) {
             next(e)

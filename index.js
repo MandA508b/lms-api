@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const errorHandlingMiddleware = require('./middlewares/error_handling.middleware')
 const courseIterationService = require('./services/course_iteration.service')
-const Transaction = require('./models/transaction.model')
 
 const app = express();
 const PORT = process.env.PORT || 5001
@@ -66,4 +65,3 @@ let CronJob = require('cron').CronJob,
 //         }
 //     }
 // );
-
