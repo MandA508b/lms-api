@@ -20,6 +20,10 @@ const schema = new db.Schema({
     exe: {
         type: Number,
         required: true
+    },
+    created_at: {
+        type: Number,
+        default: () => new Date().getTime()
     }
 
 })

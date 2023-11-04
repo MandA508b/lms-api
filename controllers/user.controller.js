@@ -127,6 +127,22 @@ class userController{
             next(e)
         }
     }
+    async findAllByPayouts(req, res, next){
+        try{
+            let {start_at, finish_at} = req.query
+
+            if(start_at===undefined || finish_at===undefined){
+                start_at = 0
+                finish_at = Date.now()
+            }
+
+            const user_wallet = await userService.findAllByPayouts(start_at, finish_at)
+
+            return res.json(user_wallet)
+        }catch (e) {
+            next(e)
+        }
+    }
 
 
 

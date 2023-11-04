@@ -9,6 +9,10 @@ const schema = new db.Schema({
         type: String,
         required: false
     },
+    course_iteration_winner_id:{
+        type: db.Schema.Types.ObjectId,
+        required: false
+    },
     user_id:{
         type: db.Schema.Types.ObjectId,
         required: true

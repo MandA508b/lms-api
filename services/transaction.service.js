@@ -27,7 +27,7 @@ class transactionService{
         }
     }
 
-    async countUserWallet(user_id){
+        async countUserWallet(user_id){
         try{
             const transactions = await Transaction.find({user_id}).sort({created_at: -1})
             let exe = 0,
@@ -51,7 +51,7 @@ class transactionService{
             if (user_info === null) {
                 throw ApiError.badRequest('Заповінть профіль!');
             }
-            const orderDate = Math.floor(Date.now() / 1000); // Поточний час в секундах
+            const orderDate = Math.floor(Date.now() / 1000); // Поточний час в секундах todo: Date.now()
             const productName = [course.name];
             const productPrice = [price];
             const productCount = [1];

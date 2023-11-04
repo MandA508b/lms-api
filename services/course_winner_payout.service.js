@@ -2,7 +2,7 @@ const Course_winner_payout = require('../models/course_winner_payout.model')
 const Course_iteration = require('../models/course_iteration.model')
 const Course_iteration_winner = require('../models/course_iteration_winner.model')
 const exeService = require('./exe.service')
-const transactionService = require('./transaction.service')
+const Transaction = require('../models/transaction.model')
 
 class courseWinnerPayoutsService{
 
@@ -17,8 +17,13 @@ class courseWinnerPayoutsService{
                 const usdt = (course_iteration.participants*course.price)*0.8/course_iteration_winners.length*0.8,
                     exe = ((course_iteration.participants*course.price)*0.8/course_iteration_winners.length*0.2)/exe_price
                 for (let key in course_iteration_winners) {
-                    const course_winner_payout = await Course_winner_payout.create({usdt, exe, user_id: course_iteration_winners[key].user_id , course_id: course._id, course_iteration_id: course_iteration._id})
-                    const transaction = await transactionService.create({user_id: course_iteration_winners[key].user_id, exe_price, exe_count: exe, usdt_count: usdt, kind: "payout", status: "completed"})
+                    try {
+                        const course_winner_payout = await Course_winner_payout.create({usdt, exe, user_id: course_iteration_winners[key].user_id , course_id: course._id, course_iteration_id: course_iteration._id})
+                        const transaction = await Transaction.create({user_id: course_iteration_winners[key].user_id, exe_price, exe_count: exe, usdt_count: usdt, kind: "payout", status: "completed"})
+                    }catch (e) {
+                    }
+
+
                 }
 
                 Course_iteration_winner.deleteMany({course_iteration_id: course_iteration._id})

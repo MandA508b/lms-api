@@ -14,9 +14,11 @@ class courseIterationService{
             const courses = await Course.find()
             for (let key in courses) {
                 try{
+
                     start_at = date + courses[key].duration * 86400000
                     const finish_at = start_at + courses[key].duration * 86400000
-                    const finish_at_next = start_at + courses[key].duration * 86400000
+                    const finish_at_next = finish_at + courses[key].duration * 86400000
+
                     const candidate_course_iteration = await Course_iteration.find({course_id: courses[key]._id , finish_at: {$gt: start_at} })
                     if(candidate_course_iteration.length>1 || courses[key].is_published ===false)continue;
                     if(candidate_course_iteration.length===0){
@@ -25,7 +27,7 @@ class courseIterationService{
                     const next_course_iteration = await Course_iteration.create({course_id: courses[key]._id, start_at: finish_at, finish_at: finish_at_next})
 
                     // calculating course winners for exist iterations
-                    await courseWinnerPayoutService.calcPayoutsForCourseIteration(courses[key])//todo: async?
+                    await courseWinnerPayoutService.calcPayoutsForCourseIteration(courses[key])
                 }catch(e){
                     courses[key].is_published=false
                     courses[key].save()
