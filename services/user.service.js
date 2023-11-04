@@ -1,4 +1,7 @@
 const User = require('../models/user.model')
+const Course = require('../models/course.model')
+const Course_iteration = require('../models/course_iteration.model')
+const Course_winner_payout = require('../models/course_winner_payout.model')
 const bcrypt = require('bcrypt')
 const uuid = require('uuid')
 const ApiError = require(`../errors/api.error`)
@@ -109,6 +112,49 @@ class userService{
 
     async activation(activationLink){
         const user = await User.findOneAndUpdate({activationLink}, {isActivated: true})
+    }
+
+    async findAllByPayouts(start_at, finish_at){
+        const users = await User.find({role: "student"})
+        let users_list = []
+        for(let u_key in users){
+            try{
+
+                let total_payout = {
+                    usdt_count: 0,
+                    exe_count: 0
+                }
+
+                let user_wins = []
+                const course_winner_payouts = await Course_winner_payout.find({user_id: users[u_key]._id, created_at: { $gte: start_at, $lte: finish_at }})
+                for (let p_key in course_winner_payouts){
+                    try{
+                        total_payout.usdt_count += course_winner_payouts[p_key].usdt
+                        total_payout.exe_count += course_winner_payouts[p_key].exe
+
+                        const course = await Course.findById(course_winner_payouts[p_key].course_id)
+                        const course_iteration = await Course_iteration.findById(course_winner_payouts[p_key].course_iteration_id)
+                        user_wins.push({
+                            course_name: course.name,
+                            payout: {
+                                usdt_count: course_winner_payouts[p_key].usdt,
+                                exe_count: course_winner_payouts[p_key].exe
+                            },
+                            participants: course_iteration.participants,
+                            start_at: course_iteration.start_at,
+                            finish_at: course_iteration.finish_at
+                        })
+                    }catch (e) {}
+                }
+                users_list.push({
+                    user: users[u_key].email,
+                    total_payout,
+                    user_wins
+                })
+
+            }catch (e) {}
+        }
+        return users_list
     }
 
 }

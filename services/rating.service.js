@@ -8,9 +8,12 @@ class ratingService{
     async createLessonRating(user_id, lesson_id, rating){
         try{
             const lesson_rating = await LessonRating.findOne({lesson_id})
+            if(lesson_rating===null){
+                throw ApiError.badRequest()
+            }
             const course_rating = await CourseRating.findOne({course_id: lesson_rating.course_id})
 
-            if(lesson_rating===null || course_rating===null){
+            if(course_rating===null){
                 throw ApiError.badRequest()
             }
             const created_rating = await Rating.create({user_id, item_id: lesson_id, rating})
