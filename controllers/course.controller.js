@@ -5,11 +5,11 @@ class courseController{
 
     async create(req,res,next) {
         try {
-            const {user_id, name, description, duration, price, language_id} = req.body
-            if(!user_id || !name || !description || !duration || price === undefined || !language_id) {
+            const {user_id, name, description, duration, price, language_id, course_theme_id} = req.body
+            if(!user_id || !name || !description || !duration || price === undefined || !language_id || !course_theme_id) {
                 return next(ApiError.badRequest())
             }
-            const course = await courseService.create(user_id, name, description, duration, price, language_id)
+            const course = await courseService.create(user_id, name, description, duration, price, language_id, course_theme_id)
 
             return res.json(course)
         } catch (e) {

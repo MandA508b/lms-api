@@ -1,5 +1,6 @@
 const Course = require('../models/course.model')
 const Lesson = require('../models/lesson.model')
+const CourseTheme = require('../models/course_theme.model')
 const lessonService = require('./lesson.service')
 const CourseRating = require('../models/course_rating.model')
 const Course_iteration = require('../models/course_iteration.model')
@@ -10,14 +11,12 @@ const courseRegistrationService = require('../services/course_registration.servi
 const courseIterationService = require('./course_iteration.service')
 const Language = require('../models/language.model')
 const ApiError = require(`../errors/api.error`)
-const {fnAddWatermark} = require("ffmpeg/lib/video");
-const {cache} = require("express/lib/application");
 
 class courseService{
 
-    async create(user_id, name, description, duration, price, language_id) {
+    async create(user_id, name, description, duration, price, language_id, course_theme_id) {
         try{
-            const course = await Course.create({user_id, name, description, duration, price, language_id})
+            const course = await Course.create({user_id, name, description, duration, price, language_id, course_theme_id})
             const course_rating = await CourseRating.create({course_id: course._id})
             return {course, course_rating}
         }catch (e) {
@@ -132,6 +131,7 @@ class courseService{
             for (let key in courses) {
                 try{
                     const course_rating = await CourseRating.findOne({course_id: courses[key]._id})
+                    const course_theme = await CourseTheme.findById(courses[key].course_theme_id)
                     const language = await Language.findById(courses[key].language_id)
                     const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
 
@@ -140,9 +140,9 @@ class courseService{
                     const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
                     if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
                         if(course_iteration.course_iteration!==null){
-                            courses_list.push({course: courses[key], registered: false, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
+                            courses_list.push({course: courses[key], course_theme, registered: false, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
                         }else{
-                            courses_list.push({course: courses[key], registered: false, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                            courses_list.push({course: courses[key], course_theme, registered: false, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
                         }
                         continue;
                     }
@@ -151,9 +151,9 @@ class courseService{
                         actual_lesson = await lessonService.findActualLesson(courses[key]._id, course_iteration.course_iteration._id, user_id)
                     }
                     if(course_iteration.course_iteration!==null){
-                        courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
+                        courses_list.push({course: courses[key], course_theme, actual_lesson, registered: true, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
                     }else{
-                        courses_list.push({course: courses[key], actual_lesson, registered: true, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                        courses_list.push({course: courses[key], course_theme, actual_lesson, registered: true, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
                     }
                 }catch (e) {
 
@@ -171,6 +171,7 @@ class courseService{
             const courses = await Course.find({is_published: true, user_id: author_id})
             let courses_list = []
             for (let key in courses) {
+                const course_theme = await CourseTheme.findById(courses[key].course_theme_id)
                 const language = await Language.findById(courses[key].language_id)
                 const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
                 if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
@@ -178,10 +179,10 @@ class courseService{
 
                 if(course_iteration.course_iteration!==null){
                     const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration.course_iteration._id)
-                    courses_list.push({course: courses[key], participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.course_iteration, language})
+                    courses_list.push({course: courses[key], course_theme, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.course_iteration, language})
                 }else{
                     const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration.next_course_iteration._id)
-                    courses_list.push({course: courses[key], participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.next_course_iteration, language})
+                    courses_list.push({course: courses[key], course_theme, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.next_course_iteration, language})
                 }
             }
 
@@ -210,6 +211,7 @@ class courseService{
     async findById(course_id){
         try {
             const course = await Course.findById(course_id)
+            const course_theme = await CourseTheme.findById(course.course_theme_id)
             const language = await Language.findById(course.language_id)
             const course_rating = await CourseRating.findOne({course_id: course_id})
             const course_iteration = await courseIterationService.actualIteration(course_id)
@@ -218,7 +220,7 @@ class courseService{
             }
             const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration.course_iteration._id)
 
-            return {course, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration_id: course_iteration._id, participants: course_iteration.course_iteration.participants, language}
+            return {course, course_theme, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration_id: course_iteration._id, participants: course_iteration.course_iteration.participants, language}
         }catch (e) {
             console.log("error: ", e)
         }
@@ -232,6 +234,7 @@ class courseService{
             for (let key in user_iterations) {
                 try{
                     const course = await Course.findById(user_iterations[key].course_id)
+                    const course_theme = await CourseTheme.findById(course.course_theme_id)
                     const language = await Language.findById(course.language_id)
                     const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
                     const course_rating = await CourseRating.findOne({course_id: user_iterations[key].course_id})
@@ -242,7 +245,7 @@ class courseService{
                         actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
                     }
 
-                    courses.push({course, course_rating, passed_lessons, actual_lesson, course_iteration, language})
+                    courses.push({course, course_theme, course_rating, passed_lessons, actual_lesson, course_iteration, language})
                 }catch (e) {
                     
                 }
