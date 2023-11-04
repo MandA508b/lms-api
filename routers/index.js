@@ -14,6 +14,7 @@ const userInfoRouter = require('./user_info.router')
 const exeRouter = require('./exe.router')
 const transactionRouter = require('./transaction.router')
 const languageRouter = require('./language.router')
+const courseThemeRouter = require('./course_theme.router')
 
 router.use('/user', userRouter)
 router.use('/userAnswer', userAnswerRouter)
@@ -29,5 +30,6 @@ router.use('/userInfo', userInfoRouter)
 router.use('/exe', exeRouter)
 router.use('/transaction', transactionRouter)
 router.use('/language', languageRouter)
+router.use('/courseTheme', courseThemeRouter)
 
 module.exports = router

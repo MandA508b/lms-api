@@ -36,6 +36,10 @@ const schema = new db.Schema({
     language_id: {
         type: db.Schema.Types.ObjectId,
         required: true
+    },
+    course_theme_id: {
+        type: db.Schema.Types.ObjectId,
+        required: true
     }
 })
 
