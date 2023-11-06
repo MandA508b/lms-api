@@ -139,6 +139,20 @@ class courseController{
         }
     }
 
+    async updateDuration(req ,res, next) {
+        try {
+            const {course_id, start_at, duration} = req.body
+            if(!course_id || !start_at || !duration){
+                return next(ApiError.badRequest('missing course_id, start_at or duration'))
+            }
+            const courses_statistic = await courseService.updateDuration(course_id, start_at, duration)
+
+            return res.json(courses_statistic)
+        } catch (e) {
+            next(e)
+        }
+    }
+
 }
 
 module.exports = new courseController()
