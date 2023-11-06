@@ -281,14 +281,6 @@ class courseService{
         }
     }
 
-    async updateDescription(course_id, description){
-        try {
-            return await Course.findByIdAndUpdate(course_id, {description})
-        }catch (e) {
-            console.log("error: ", e)
-        }
-    }
-
     async coursesStatistics(){
         try {
             const courses = await Course.find({is_published: true})
@@ -318,6 +310,30 @@ class courseService{
                 courses_statistic.push({courseName: courses[key].name, users, lessonsData})
             }
             return courses_statistic
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async updateDescription(course_id, description){
+        try {
+            return await Course.findByIdAndUpdate(course_id, {description})
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async updateDuration(course_id, start_at, duration){
+        try {
+            const course = await Course.findByIdAndUpdate(course_id, {duration})
+            if(course===null)
+            {
+                throw ApiError.notFound("curse doesn\'t exist")
+            }
+
+            const course_iterations = await courseIterationService.updateDuration(course_id, start_at, duration)
+
+            return course
         }catch (e) {
             console.log("error: ", e)
         }

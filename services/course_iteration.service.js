@@ -55,7 +55,6 @@ class courseIterationService{
     async findById(course_iteration_id){
         try {
             const course_iteration = await Course_iteration.findById(course_iteration_id)
-            console.log(course_iteration)
             if(course_iteration === null){
                 throw ApiError.badRequest('Курс не знайдено!')
             }
@@ -99,6 +98,32 @@ class courseIterationService{
             if(next_course_iteration===[])
                 return {course_iteration, next_course_iteration: null}
             return {course_iteration, next_course_iteration: next_course_iteration[0]}
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+    async updateDuration(course_id, start_at, duration){
+        try{
+            const date = new Date().getTime()
+            let course_iterations = await Course_iteration.find({course_id, finish_at: {$gte: date}}).sort({start_at: 1})
+
+            if(course_iterations.length === 0){
+
+                throw ApiError.notFound("course iterations doesn\'t exist")
+            }
+            start_at = start_at - start_at % 86400000
+
+            if(course_iterations[0].start_at > start_at){
+                throw ApiError.badRequest(`date of start course[start_at] must be greater than ${course_iterations[0].start_at} or equal. Your redacted date equal ${start_at}`)
+            }
+
+            for(let key in course_iterations){
+                course_iterations[key].start_at = start_at
+                start_at += duration * 86400000
+                course_iterations[key].finish_at = start_at
+                await course_iterations[key].save()
+            }
+            return course_iterations
         }catch (e) {
             console.log("error: ", e)
         }
