@@ -12,6 +12,10 @@ const schema = new db.Schema({
     course_iteration_id: {
         type: db.Schema.Types.ObjectId,
         required: true
+    },
+    created_at: {
+        type: Number,
+        required: true
     }
 })
 

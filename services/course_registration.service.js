@@ -22,12 +22,10 @@ class courseRegistrationService{
                 throw ApiError.notFound('Користувача або курсу не знайдено!')
             }//checked!
 
-            const buy_course = await transactionService.buyCourse(user_id, course.price, exe_price)
-            console.log({buy_course})
-            if(!buy_course){
+            const transaction = await transactionService.buyCourse(user_id, course.price, exe_price)
+            if(!transaction){
                 throw ApiError.badRequest('недостатньо коштів!')
             }
-            console.log("skipped")
             const course_iterations = await courseIterationService.actualIteration(course_id)
 
             if(course_iterations.course_iteration !== null){
@@ -39,7 +37,7 @@ class courseRegistrationService{
                 date = date - date % 86400000
                 const days_until_end = (course_iterations.course_iteration.finish_at - date)/86400000
                 if(days_until_end >= course.lessons){//registration actual iteration
-                    const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id})
+                    const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.course_iteration._id, created_at: transaction.created_at})
                     course_iterations.course_iteration.participants = course_iterations.course_iteration.participants + 1
                     await course_iterations.course_iteration.save()
                     return course_registration
@@ -54,7 +52,7 @@ class courseRegistrationService{
                 return next_candidate
             }
             //registration next iteration
-            const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.next_course_iteration._id})
+            const course_registration = await Course_registration.create({course_id, user_id, course_iteration_id: course_iterations.next_course_iteration._id, created_at: transaction.created_at})
             course_iterations.next_course_iteration.participants = course_iterations.next_course_iteration.participants + 1
             await course_iterations.next_course_iteration.save()
             return course_registration
@@ -134,8 +132,6 @@ class courseRegistrationService{
 
     async   callbackWayforpay(data){
         try{
-            console.log(data)
-
             async function InProcessing(_data){
                 const user = User.findOne({email: _data.email})
                 if(user===null){
@@ -151,7 +147,7 @@ class courseRegistrationService{
                     exe_count: 0,
                     usdt_count: data.amount,
                     kind: "deposit",
-                    status: "completed"
+                    status: "completed"//todo: inprogressing?
                 })
 
                 console.log('Платіж розглядається:', _data.orderReference);

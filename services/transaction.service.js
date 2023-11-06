@@ -1,9 +1,13 @@
 const Transaction = require('../models/transaction.model')
+const User = require('../models/user.model')
 const ApiError = require('../errors/api.error')
 const CryptoJS = require('crypto-js')
 const uuid = require('uuid')
 const User_info = require("../models/user_info.model")
 const Transaction_info = require("../models/deposit_info.model")
+const Course_registration = require("../models/course_registration.model")
+const Course_iteration = require("../models/course_iteration.model")
+const Course = require("../models/course.model")
 
 class transactionService{
 
@@ -108,19 +112,99 @@ class transactionService{
             console.log("Помилка: ", e);
         }
     }
-    async buyCourse(user_id, course_price, exe_price){
-        try{
+    async buyCourse(user_id, course_price, exe_price) {
+        try {
             const balance = await this.countUserWallet(user_id)
-            if(balance.usdt - (Math.max(course_price/10*exe_price - balance.exe, 0) + course_price) < 0){
+            if (balance.usdt - (Math.max(course_price / 10 * exe_price - balance.exe, 0) + course_price) < 0) {
                 return false
             }
-            if(Math.max(course_price/10*exe_price - balance.exe, 0)){
-                const transaction1 = await this.create(user_id, exe_price, Math.max(course_price/10*exe_price - balance.exe, 0)/exe_price, -Math.max(course_price/10*exe_price - balance.exe, 0), 'swap', 'completed')
+            if (Math.max(course_price / 10 * exe_price - balance.exe, 0)) {
+                const transaction1 = await this.create(user_id, exe_price, Math.max(course_price / 10 * exe_price - balance.exe, 0) / exe_price, -Math.max(course_price / 10 * exe_price - balance.exe, 0), 'swap', 'completed')
             }
-            const transaction2 = await this.create(user_id, exe_price, -course_price/10, 0, 'staking', 'completed')
+            const transaction2 = await this.create(user_id, exe_price, -course_price / 10, 0, 'staking', 'completed')
             const transaction3 = await this.create(user_id, exe_price, 0, -course_price, 'buy course', 'completed')
 
-            return true
+            return transaction3
+        } catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async createWithdrawRequest(user_id, usdt_count, exe_price){
+        try{
+           const user = await User.findById(user_id)
+            if(user===null){
+                throw ApiError.notFound("user doesn\'t exist")
+            }
+
+            const user_balance = await this.countUserWallet(user_id)
+
+            if(usdt_count<user_balance.usdt){
+                throw ApiError.preconditionFailed("insufficient funds")
+            }
+
+            const transaction = await this.create(user_id, exe_price, 0, usdt_count, "withdraw", "in progress")
+
+            return transaction
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async findWithdrawRequests(){
+        try{
+            const checked_transactions = await Transaction.find({kind: "withdraw",$or: [{status: "completed"}, {status: "declined"}]}).sort({created_at: -1})
+            const transactions = await Transaction.find({kind: "withdraw", status: "in progress"}).sort({created_at: 1})
+            let inprogress_transactions = []
+            for(let key in transactions){
+                try{
+                    const user = await User.findById(transactions[key].user_id)
+                    const user_transaction = await Transaction.find({user_id: transactions[key].user_id,status: "completed"}).sort({created_at: 1})
+                    let user_history = []
+                    let user_balance = {
+                        exe_count: 0,
+                        usdt_count: 0
+                    }
+                    for (let u_t_key in user_transaction){
+
+                        user_balance.exe_count += user_transaction[u_t_key].exe_count
+                        user_balance.usdt_count += user_transaction[u_t_key].usdt_count
+
+                        if(user_transaction[u_t_key].kind==='payout' || user_transaction[u_t_key].kind==='buy course'){
+                            const course_registration = await Course_registration.findOne({user_id: transactions[key].user_id, created_at: user_transaction[u_t_key].created_at})
+                            const course_iteration = await Course_iteration.findById(course_registration.course_iteration_id)
+                            const course = await Course.findById(course_iteration.course_id)
+                            user_history.push({transaction: user_transaction[u_t_key], course_name: course.name, balance: user_balance})
+                        }else{
+                            user_history.push({transaction: user_transaction[u_t_key], balance: user_balance})
+                        }
+                    }
+                    inprogress_transactions.push({user: user.email, role: user.role, transaction: transactions[key], user_history})
+                }catch (e) {console.log(e)}
+            }
+
+            return {actual_transaction: inprogress_transactions, history: checked_transactions}
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+
+    async acceptWithdrawRequests(transaction_id){
+        try{
+            const transaction = await Transaction.findByIdAndUpdate(transaction_id, {status: "completed"})
+
+            return transaction
+        }catch (e) {
+            console.log("error: ", e)
+        }
+    }
+
+    async declinedWithdrawRequests(transaction_id){
+        try{
+            const transaction = await Transaction.findByIdAndUpdate(transaction_id, {status: "declined"})
+
+            return transaction
         }catch (e) {
             console.log("error: ", e)
         }
