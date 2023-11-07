@@ -192,7 +192,10 @@ class transactionService{
 
     async acceptWithdrawRequests(transaction_id){
         try{
-            const transaction = await Transaction.findByIdAndUpdate(transaction_id, {status: "completed"})
+            const transaction = await Transaction.findById(transaction_id)
+            transaction.status = "completed"
+            transaction.usdt_count = -transaction.usdt_count
+            await transaction.save()
 
             return transaction
         }catch (e) {
@@ -202,7 +205,10 @@ class transactionService{
 
     async declinedWithdrawRequests(transaction_id){
         try{
-            const transaction = await Transaction.findByIdAndUpdate(transaction_id, {status: "declined"})
+            const transaction = await Transaction.findById(transaction_id)
+            transaction.status = "declined"
+            transaction.usdt_count = -transaction.usdt_count
+            await transaction.save()
 
             return transaction
         }catch (e) {
