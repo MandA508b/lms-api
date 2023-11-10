@@ -8,6 +8,10 @@ const schema = new db.Schema({
     color: {
         type: String,
         required: true
+    },
+    language: {
+        type: "String",
+        required: true
     }
 })
 

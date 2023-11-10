@@ -2,17 +2,17 @@ const CourseTheme = require('../models/course_theme.model')
 
 class courseThemeService{
 
-    async create(name, color) {
+    async create(name, color, language) {
         try{
-            return  await CourseTheme.create({name, color})
+            return  await CourseTheme.create({name, color, language})
         }catch (e) {
             console.log("error: ", e)
         }
     }
 
-    async findAll() {
+    async findAll(language) {
         try{
-            return  await CourseTheme.find()
+            return  await CourseTheme.find({language})
         }catch (e) {
             console.log("error: ", e)
         }
