@@ -3,22 +3,22 @@ const ApiError = require(`../errors/api.error`)
 
 class userInfoService{
 
-    async create(user_id, first_name, second_name, phone_number) {
+    async create(user_id, first_name, second_name, phone_number, description) {
         try{
             const candidate = await User_info.findOne({user_id})
             if(candidate){
                 return candidate
             }
-            const user_info = await User_info.create({user_id, first_name, second_name, phone_number})
+            const user_info = await User_info.create({user_id, first_name, second_name, phone_number, description})
             return user_info
         }catch (e) {
             console.log("error: ", e)
         }
     }
 
-    async update(user_info_id, first_name, second_name, phone_number) {
+    async update(user_info_id, first_name, second_name, phone_number, description) {
         try{
-            const user_info = await User_info.findByIdAndUpdate(user_info_id, {first_name, second_name, phone_number})
+            const user_info = await User_info.findByIdAndUpdate(user_info_id, {first_name, second_name, phone_number, description})
 
             return user_info
         }catch (e) {
