@@ -5,11 +5,11 @@ class userInfoController{
 
     async create(req,res,next) {
         try {
-            const {user_id, first_name, second_name, phone_number} = req.body
+            const {user_id, first_name, second_name, phone_number, description} = req.body
             if(!user_id) {
                 return next(ApiError.badRequest())
             }
-            const user_info = await userInfoService.create(user_id, first_name, second_name, phone_number)
+            const user_info = await userInfoService.create(user_id, first_name, second_name, phone_number, description)
 
             return res.json(user_info)
         } catch (e) {
@@ -19,11 +19,11 @@ class userInfoController{
 
     async update(req,res,next) {
         try {
-            const {user_info_id, first_name, second_name, phone_number} = req.body
+            const {user_info_id, first_name, second_name, phone_number, description} = req.body
             if(!user_info_id) {
                 return next(ApiError.badRequest())
             }
-            const user_info = await userInfoService.update(user_info_id, first_name, second_name, phone_number)
+            const user_info = await userInfoService.update(user_info_id, first_name, second_name, phone_number, description)
 
             return res.json(user_info)
         } catch (e) {

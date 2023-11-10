@@ -17,8 +17,11 @@ const schema = new db.Schema({
     phone_number: {
         type: String,
         trim: true
-}
-
+    },
+    description: {
+        type: String,
+        trim: true
+    }
 });
 
 module.exports = db.model('User_info', schema)

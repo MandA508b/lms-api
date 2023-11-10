@@ -118,7 +118,9 @@ class courseRegistrationService{
                 return {status: true}
             }
 
-            const price =  (course.price + (course.price / 10 * exe_price)) - (balance.exe * exe_price + balance.usdt)
+            let price =  (course.price + (course.price / 10 * exe_price)) - (balance.exe * exe_price + balance.usdt)
+            price = Math.max(Math.ceil(price*100)/100, 0.1)
+
             const data = await transactionService.depositShortage(course, user, price, exe_price)
             return {
                 status: false,

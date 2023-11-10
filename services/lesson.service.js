@@ -40,7 +40,6 @@ class lessonService{
     }
     async createFullLesson(data, video){
         try{
-            console.log("log: creating full lesson")
             let video_name = crypto.randomBytes(30).toString('hex') + '.mp4'
             await this.uploadVideo(video, video_name)
             video_name = process.env.AWS_BUACKET_URL + 'video/' + video_name

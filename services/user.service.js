@@ -1,4 +1,5 @@
 const User = require('../models/user.model')
+const Author_rating = require('../models/author_rating.model')
 const Course = require('../models/course.model')
 const Course_iteration = require('../models/course_iteration.model')
 const Course_winner_payout = require('../models/course_winner_payout.model')
@@ -36,6 +37,9 @@ class userService{
             const time = new Date().toISOString()
             const activationLink = uuid.v4()
             const user = await User.create({email, password: hashPassword, time, role, activationLink})
+            if(role==='author'){
+                const author_rating = await Author_rating.create({user_id: user._id})
+            }
             await mailService.sendActivationMail(email, `${process.env.SERVER_URL}/user/activate/${activationLink}`)
             const userDto = new UserDto(user)
             const tokens = await tokenService.generateTokens({...userDto})
