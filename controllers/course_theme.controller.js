@@ -4,12 +4,12 @@ const courseThemeService = require('../services/course_theme.service')
 class courseThemeController{
     async create(req ,res, next) {
         try {
-            const {name, color} = req.body
+            const {name, color, language} = req.body
 
             if(!name || !color){
                 return next(ApiError.badRequest())
             }
-            const course_theme = await courseThemeService.create(name, color)
+            const course_theme = await courseThemeService.create(name, color, language)
 
             return res.json(course_theme)
         } catch (e) {
@@ -19,7 +19,8 @@ class courseThemeController{
 
     async findAll(req ,res, next) {
         try {
-            const course_themes = await courseThemeService.findAll()
+            const {language} = req.query
+            const course_themes = await courseThemeService.findAll(language)
 
             return res.json(course_themes)
         } catch (e) {
