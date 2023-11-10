@@ -9,10 +9,8 @@ class lessonController{
             const {data_} = req.body
             const data = JSON.parse(data_)
             const video = req.file
-<<<<<<< HEAD
-=======
+
             console.log(data.course_id ,data.name,data.description,data.questions ,video , data.duration)
->>>>>>> d46b1c064bd92e71efb7163c77a3dfe069acef02
             if(!data.course_id || !data.name || !data.description || !data.questions || !video || data.duration===undefined){
                 return next(ApiError.badRequest())
             }
