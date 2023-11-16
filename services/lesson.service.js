@@ -14,10 +14,10 @@ class lessonService{
             const s3 = new AWS.S3({
                 accessKeyId: process.env.AWS_ACCESS_KEY_ID,
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-                region: process.env.AWS_region
+                region: process.env.AWS_REGION
             })
 
-            const bucketName = 'es-video';
+            const bucketName = process.env.AWS_BUCKET_NAME;
             const newFileNameKey= `video/${video_name}`
 
             const params = {
@@ -42,7 +42,7 @@ class lessonService{
         try{
             let video_name = crypto.randomBytes(30).toString('hex') + '.mp4'
             await this.uploadVideo(video, video_name)
-            video_name = process.env.AWS_BUACKET_URL + 'video/' + video_name
+            video_name = process.env.CDN_URL + 'video/' + video_name
             let created_at = new Date().getTime()
             const course = await Course.findById(data.course_id)
             const lesson =  await Lesson.create({course_id: data.course_id, name: data.name, description: data.description, video_name, created_at, video_duration: data.duration, number: course.lessons + 1})
@@ -73,7 +73,7 @@ class lessonService{
         try{
             let video_name = crypto.randomBytes(30).toString('hex') + '.mp4'
             await this.uploadVideo(video, video_name)
-            video_name = process.env.AWS_BUACKET_URL + 'video/' + video_name
+            video_name = process.env.CDN_URL + 'video/' + video_name
 
             const course = await Course.findById(course_id)
             let created_at = new Date().getTime()
