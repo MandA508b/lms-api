@@ -40,6 +40,10 @@ const schema = new db.Schema({
     course_theme_id: {
         type: db.Schema.Types.ObjectId,
         required: true
+    },
+    course_image: {
+        type: String,
+        required: true
     }
 })
 

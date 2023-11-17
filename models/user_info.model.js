@@ -8,19 +8,28 @@ const schema = new db.Schema({
     },
     first_name:{
         type:String,
-        trim: true
+        trim: true,
+        required: true
     },
     second_name:{
         type: String,
-        trim: true
+        trim: true,
+        required: true
     },
     phone_number: {
         type: String,
-        trim: true
+        trim: true,
+        required: true
     },
     description: {
         type: String,
-        trim: true
+        trim: true,
+        required: true
+    },
+    avatar: {
+        type: String,
+        trim: true,
+        required: true
     }
 });
 

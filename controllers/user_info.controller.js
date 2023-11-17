@@ -6,10 +6,12 @@ class userInfoController{
     async create(req,res,next) {
         try {
             const {user_id, first_name, second_name, phone_number, description} = req.body
-            if(!user_id) {
+
+            const avatar = req.file
+            if(!user_id || !first_name || !second_name || !phone_number || !description || avatar === undefined) {
                 return next(ApiError.badRequest())
             }
-            const user_info = await userInfoService.create(user_id, first_name, second_name, phone_number, description)
+            const user_info = await userInfoService.create(user_id, first_name, second_name, phone_number, description, avatar)
 
             return res.json(user_info)
         } catch (e) {
@@ -20,10 +22,13 @@ class userInfoController{
     async update(req,res,next) {
         try {
             const {user_info_id, first_name, second_name, phone_number, description} = req.body
-            if(!user_info_id) {
+
+            const avatar = req.file
+
+            if(!user_info_id || !first_name || !second_name || !phone_number || !description || avatar === undefined) {
                 return next(ApiError.badRequest())
             }
-            const user_info = await userInfoService.update(user_info_id, first_name, second_name, phone_number, description)
+            const user_info = await userInfoService.update(user_info_id, first_name, second_name, phone_number, description, avatar)
 
             return res.json(user_info)
         } catch (e) {

@@ -8,7 +8,6 @@ const uuid = require('uuid')
 const ApiError = require(`../errors/api.error`)
 const tokenService = require('../services/token.service')
 const mailService = require('../services/mail.service')
-const userInfoService = require('../services/user_info.service')
 const UserDto = require('../dtos/user.dto')
 
 class userService{
@@ -44,7 +43,6 @@ class userService{
             const userDto = new UserDto(user)
             const tokens = await tokenService.generateTokens({...userDto})
             await tokenService.saveToken(userDto.id, userDto.role, userDto.email, tokens.refreshToken)
-            const user_info = await userInfoService.create(user._id, ' ', ' ', ' ')
             return ({...tokens, user})
         }catch (e) {
             console.log("error: ", e)

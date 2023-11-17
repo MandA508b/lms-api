@@ -6,10 +6,12 @@ class courseController{
     async create(req,res,next) {
         try {
             const {user_id, name, description, duration, price, language_id, course_theme_id} = req.body
-            if(!user_id || !name || !description || !duration || price === undefined || !language_id || !course_theme_id) {
+
+            const image = req.file
+            if(!user_id || !name || !description || !duration || price === undefined || !language_id || !course_theme_id || !image) {
                 return next(ApiError.badRequest())
             }
-            const course = await courseService.create(user_id, name, description, duration, price, language_id, course_theme_id)
+            const course = await courseService.create(user_id, name, description, duration, price, language_id, course_theme_id, image)
 
             return res.json(course)
         } catch (e) {

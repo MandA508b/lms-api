@@ -11,12 +11,19 @@ const courseRegistrationService = require('../services/course_registration.servi
 const courseIterationService = require('./course_iteration.service')
 const Language = require('../models/language.model')
 const ApiError = require(`../errors/api.error`)
+const s3Service = require('./s3.service')
+const crypto = require("crypto");
 
 class courseService{
 
-    async create(user_id, name, description, duration, price, language_id, course_theme_id) {
+    async create(user_id, name, description, duration, price, language_id, course_theme_id, image) {
         try{
-            const course = await Course.create({user_id, name, description, duration, price, language_id, course_theme_id})
+            const expansion = image.originalname.split('.')[1]
+            let course_image = crypto.randomBytes(30).toString('hex') + `.${expansion}`
+            await s3Service.upload(image, course_image, "images")
+            course_image = process.env.CDN_URL + 'images/' + course_image
+
+            const course = await Course.create({user_id, name, description, duration, price, language_id, course_theme_id, course_image})
             const course_rating = await CourseRating.create({course_id: course._id})
             return {course, course_rating}
         }catch (e) {
