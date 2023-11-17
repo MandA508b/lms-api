@@ -40,13 +40,10 @@ const schema = new db.Schema({
     course_theme_id: {
         type: db.Schema.Types.ObjectId,
         required: true
-<<<<<<< HEAD
     },
     course_image: {
         type: String,
         required: true
-=======
->>>>>>> 6910e5bfc81f0013a9d3d6848479de1dbe129f90
     }
 })
 

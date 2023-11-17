@@ -2,11 +2,6 @@ const Router = require('express')
 const router = new Router()
 const lessonController = require('../controllers/lesson.controller')
 const multer  = require('multer')
-<<<<<<< HEAD
-=======
-const path = require('path')
-let crypto = require('crypto')
->>>>>>> 6910e5bfc81f0013a9d3d6848479de1dbe129f90
 // const admin_middleware = require('../middlewares/admin.middleware')
 const auth_middleware = require('../middlewares/auth.middleware')
 const author_middleware = require('../middlewares/author.middleware')

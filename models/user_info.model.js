@@ -8,7 +8,6 @@ const schema = new db.Schema({
     },
     first_name:{
         type:String,
-<<<<<<< HEAD
         trim: true,
         required: true
     },
@@ -31,21 +30,6 @@ const schema = new db.Schema({
         type: String,
         trim: true,
         required: true
-=======
-        trim: true
-    },
-    second_name:{
-        type: String,
-        trim: true
-    },
-    phone_number: {
-        type: String,
-        trim: true
-    },
-    description: {
-        type: String,
-        trim: true
->>>>>>> 6910e5bfc81f0013a9d3d6848479de1dbe129f90
     }
 });
 
