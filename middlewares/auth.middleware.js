@@ -1,8 +1,7 @@
 const ApiError = require(`../errors/api.error`)
 const tokenService = require('../services/token.service')
-const userInfoService = require("../services/user_info.service");
 
-module.exports = async (req, res, next) =>{
+module.exports = (req, res, next) =>{
     if(req.method === 'OPTIONS'){
         next()
     }
@@ -23,11 +22,6 @@ module.exports = async (req, res, next) =>{
 
         if(userData.email && userData.isActivated !== true){
             return next(ApiError.forbidden('Користувач не підтвердив пошту'))
-        }
-
-        const user_info = await userInfoService.findById(userData.id)
-        if(user_info===null){
-            return next(ApiError.forbidden('Користувач не заповнив профіль'))
         }
 
         req.user = userData
