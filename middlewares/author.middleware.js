@@ -23,8 +23,9 @@ module.exports = async (req, res, next) =>{
         const user_info =await userInfoService.findById(userData.id)
         if(user_info===null){
             return next(ApiError.forbidden('Користувач не заповнив профіль'))
+            console.log(2)
         }
-        console.log(2)
+        console.log(3)
 
         req.user = userData
         next()
