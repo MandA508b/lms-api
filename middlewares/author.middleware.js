@@ -19,13 +19,10 @@ module.exports = async (req, res, next) =>{
             return next(ApiError.forbidden('Користувач не є автором'))
         }
 
-        console.log(1)
         const user_info =await userInfoService.findById(userData.id)
         if(user_info===null){
-            console.log(2)
             return next(ApiError.forbidden('Користувач не заповнив профіль'))
         }
-        console.log(3)
 
         req.user = userData
         next()
