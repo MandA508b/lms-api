@@ -3,7 +3,7 @@ const tokenService = require('../services/token.service')
 const userInfoService = require("../services/user_info.service");
 const {promise} = require("bcrypt/promises");
 
-module.exports = (req, res, next) =>{
+module.exports = async (req, res, next) =>{
     if(req.method === 'OPTIONS'){
         next()
     }
@@ -19,10 +19,12 @@ module.exports = (req, res, next) =>{
             return next(ApiError.forbidden('Користувач не є автором'))
         }
 
-        const user_info = userInfoService.findById(userData.id).promises()
+        console.log(1)
+        const user_info =await userInfoService.findById(userData.id)
         if(user_info===null){
             return next(ApiError.forbidden('Користувач не заповнив профіль'))
         }
+        console.log(2)
 
         req.user = userData
         next()
