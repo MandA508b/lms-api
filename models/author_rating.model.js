@@ -3,7 +3,8 @@ const db= require('../db/index')
 const schema = new db.Schema({
     user_id:{
         type: db.Schema.Types.ObjectId,
-        required: true
+        required: true,
+        unique: true
     },
     rating: {
         type: Number,

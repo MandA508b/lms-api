@@ -8,7 +8,8 @@ const auth_middleware = require('../middlewares/auth.middleware')
 const multer = require("multer");
 const upload = multer()
 
-router.post('/create', upload.single('avatar'), userInfoController.create)
+router.post('/create',auth_middleware, upload.single('avatar'), userInfoController.create)
+router.get('/findByUserId', auth_middleware, userInfoController.findByUserId)
 router.put('/update', auth_middleware, upload.single('avatar'), userInfoController.update)
 
 

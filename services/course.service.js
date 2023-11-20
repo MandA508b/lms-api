@@ -1,5 +1,7 @@
 const Course = require('../models/course.model')
 const Lesson = require('../models/lesson.model')
+const User_info = require('../models/user_info.model')
+const Author_rating = require('../models/author_rating.model')
 const CourseTheme = require('../models/course_theme.model')
 const lessonService = require('./lesson.service')
 const CourseRating = require('../models/course_rating.model')
@@ -138,18 +140,51 @@ class courseService{
             for (let key in courses) {
                 try{
                     const course_rating = await CourseRating.findOne({course_id: courses[key]._id})
-                    const course_theme = await CourseTheme.findById(courses[key].course_theme_id)
-                    const language = await Language.findById(courses[key].language_id)
                     const course_iteration = await courseIterationService.actualIteration(courses[key]._id)
 
                     if(course_iteration===undefined || (course_iteration.course_iteration===null && course_iteration.next_course_iteration===null))continue;
 
+                    const language = await Language.findById(courses[key].language_id)
+                    const course_theme = await CourseTheme.findById(courses[key].course_theme_id)
+                    const author_rating = await Author_rating.findOne({user_id: courses[key].user_id})
+                    let author_info = await User_info.findOne({user_id: courses[key].user_id})
+                    delete author_info.phone_number
+                    const lessons_info = await lessonService.findAllByCourse(courses[key]._id)
+
                     const actual_registration = await courseRegistrationService.actualRegistration(user_id, course_iteration, courses[key]._id)
                     if(actual_registration.course_registration===null && actual_registration.next_course_registration===null){
                         if(course_iteration.course_iteration!==null){
-                            courses_list.push({course: courses[key], course_theme, registered: false, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
+                            courses_list.push({
+                                course: courses[key],
+                                author_info,
+                                author_rating,
+                                course_theme,
+                                registered: false,
+                                participants: course_iteration.course_iteration.participants,
+                                course_rating: {
+                                    rating: course_rating.rating,
+                                    votes: course_rating.votes
+                                },
+                                course_iteration: course_iteration.course_iteration,
+                                lessons_info,
+                                language
+                            })
                         }else{
-                            courses_list.push({course: courses[key], course_theme, registered: false, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                            courses_list.push({
+                                course: courses[key],
+                                author_info,
+                                author_rating,
+                                course_theme,
+                                registered: false,
+                                participants: course_iteration.next_course_iteration.participants,
+                                course_rating: {
+                                    rating: course_rating.rating,
+                                    votes: course_rating.votes
+                                },
+                                course_iteration: course_iteration.next_course_iteration,
+                                lessons_info,
+                                language
+                            })
                         }
                         continue;
                     }
@@ -158,9 +193,39 @@ class courseService{
                         actual_lesson = await lessonService.findActualLesson(courses[key]._id, course_iteration.course_iteration._id, user_id)
                     }
                     if(course_iteration.course_iteration!==null){
-                        courses_list.push({course: courses[key], course_theme, actual_lesson, registered: true, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.course_iteration, language})
+                        courses_list.push({
+                            course: courses[key],
+                            author_info,
+                            author_rating,
+                            course_theme,
+                            actual_lesson,
+                            registered: true,
+                            participants: course_iteration.course_iteration.participants,
+                            course_rating: {
+                                rating: course_rating.rating,
+                                votes: course_rating.votes
+                            },
+                            course_iteration: course_iteration.course_iteration,
+                            lessons_info,
+                            language
+                        })
                     }else{
-                        courses_list.push({course: courses[key], course_theme, actual_lesson, registered: true, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, course_iteration: course_iteration.next_course_iteration, language})
+                        courses_list.push({
+                            course: courses[key],
+                            author_info,
+                            author_rating,
+                            course_theme,
+                            actual_lesson,
+                            registered: true,
+                            participants: course_iteration.next_course_iteration.participants,
+                            course_rating: {
+                                rating: course_rating.rating,
+                                votes: course_rating.votes
+                            },
+                            course_iteration: course_iteration.next_course_iteration,
+                            lessons_info,
+                            language
+                        })
                     }
                 }catch (e) {
 
@@ -186,10 +251,32 @@ class courseService{
 
                 if(course_iteration.course_iteration!==null){
                     const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration.course_iteration._id)
-                    courses_list.push({course: courses[key], course_theme, participants: course_iteration.course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.course_iteration, language})
+                    courses_list.push({
+                        course: courses[key],
+                        course_theme,
+                        participants: course_iteration.course_iteration.participants,
+                        course_rating: {
+                            rating: course_rating.rating,
+                            votes: course_rating.votes
+                        },
+                        lessons,
+                        course_iteration: course_iteration.course_iteration,
+                        language
+                    })
                 }else{
                     const lessons = await lessonService.findAllByCourseAuthor(courses[key]._id, course_iteration.next_course_iteration._id)
-                    courses_list.push({course: courses[key], course_theme, participants: course_iteration.next_course_iteration.participants, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration: course_iteration.next_course_iteration, language})
+                    courses_list.push({
+                        course: courses[key],
+                        course_theme,
+                        participants: course_iteration.next_course_iteration.participants,
+                        course_rating: {
+                            rating: course_rating.rating,
+                            votes: course_rating.votes
+                        },
+                        lessons,
+                        course_iteration: course_iteration.next_course_iteration,
+                        language
+                    })
                 }
             }
 
@@ -218,6 +305,9 @@ class courseService{
     async findById(course_id){
         try {
             const course = await Course.findById(course_id)
+            const author_rating = await Author_rating.findOne({user_id: course.user_id})
+            let author_info = await User_info.findOne({user_id: course.user_id})
+            delete author_info.phone_number
             const course_theme = await CourseTheme.findById(course.course_theme_id)
             const language = await Language.findById(course.language_id)
             const course_rating = await CourseRating.findOne({course_id: course_id})
@@ -227,7 +317,20 @@ class courseService{
             }
             const lessons = await lessonService.findAllByCourseAuthor(course_id, course_iteration.course_iteration._id)
 
-            return {course, course_theme, course_rating: {rating: course_rating.rating, votes: course_rating.votes}, lessons, course_iteration_id: course_iteration._id, participants: course_iteration.course_iteration.participants, language}
+            return {
+                course,
+                author_info,
+                author_rating,
+                course_theme,
+                course_rating: {
+                    rating: course_rating.rating,
+                    votes: course_rating.votes
+                },
+                lessons,
+                course_iteration_id: course_iteration._id,
+                participants: course_iteration.course_iteration.participants,
+                language
+            }
         }catch (e) {
             console.log("error: ", e)
         }
@@ -241,6 +344,12 @@ class courseService{
             for (let key in user_iterations) {
                 try{
                     const course = await Course.findById(user_iterations[key].course_id)
+
+                    const author_rating = await Author_rating.findOne({user_id: course.user_id})
+                    let author_info = await User_info.findOne({user_id: course.user_id})
+                    delete author_info.phone_number
+                    const lessons_info = await lessonService.findAllByCourse(courses[key]._id)
+
                     const course_theme = await CourseTheme.findById(course.course_theme_id)
                     const language = await Language.findById(course.language_id)
                     const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
@@ -252,7 +361,18 @@ class courseService{
                         actual_lesson = await lessonService.findActualLesson(user_iterations[key].course_id,user_iterations[key].course_iteration_id, user_id)
                     }
 
-                    courses.push({course, course_theme, course_rating, passed_lessons, actual_lesson, course_iteration, language})
+                    courses.push({
+                        course,
+                        author_rating,
+                        author_info,
+                        course_theme,
+                        course_rating,
+                        passed_lessons,
+                        actual_lesson,
+                        course_iteration,
+                        lessons_info,
+                        language
+                    })
                 }catch (e) {
                     
                 }
@@ -297,24 +417,46 @@ class courseService{
                 if(actual_iteration.course_iteration===null){
                     continue
                 }
-                const actual_registrations = await Course_registration.find({course_iteration_id: actual_iteration.course_iteration._id})
+                const actual_registrations = await Course_registration.find({
+                    course_iteration_id: actual_iteration.course_iteration._id
+                })
                 let users = []
                 for(let a_r_key in actual_registrations){
                     const user = await User.findById(actual_registrations[a_r_key].user_id)
                     users.push(user.email)
                 }
-                const lessons = await Lesson.find({course_id: courses[key]._id})
+                const lessons = await Lesson.find({
+                    course_id: courses[key]._id
+                })
                 let lessonsData = []
                 for(let lessons_key in lessons){
-                    const user_answers = await User_answer.find({course_iteration_id: actual_iteration.course_iteration._id, lesson_id: lessons[lessons_key]._id}).sort({user_id: 1})
+                    const user_answers = await User_answer.find({
+                        course_iteration_id: actual_iteration.course_iteration._id,
+                        lesson_id: lessons[lessons_key]._id
+                    }).sort({user_id: 1})
+
                     let lessons_users = []
                     for (let u_a_key in user_answers) {
                           const user = await User.findById(user_answers[u_a_key].user_id)
-                          lessons_users.push({user: user.email, user_answer: {is_correct: user_answers[u_a_key].is_correct, in_time: user_answers[u_a_key].in_time, attempt: user_answers[u_a_key].attempt}})
+                          lessons_users.push({
+                              user: user.email,
+                              user_answer: {
+                                  is_correct: user_answers[u_a_key].is_correct,
+                                  in_time: user_answers[u_a_key].in_time,
+                                  attempt: user_answers[u_a_key].attempt
+                              }
+                          })
                     }
-                    lessonsData.push({lesson: lessons[lessons_key].name, users: lessons_users})
+                    lessonsData.push({
+                        lesson: lessons[lessons_key].name,
+                        users: lessons_users
+                    })
                 }
-                courses_statistic.push({courseName: courses[key].name, users, lessonsData})
+                courses_statistic.push({
+                    courseName: courses[key].name,
+                    users,
+                    lessonsData
+                })
             }
             return courses_statistic
         }catch (e) {

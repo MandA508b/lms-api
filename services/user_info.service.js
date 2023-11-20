@@ -54,7 +54,7 @@ class userInfoService{
         }
     }
 
-    async findById(user_id) {
+    async findByUserId(user_id) {
         try{
             const user_info = await User_info.findOne({user_id})
 

@@ -38,13 +38,13 @@ class userInfoController{
         }
     }
 
-    async findById(req,res,next) {
+    async findByUserId(req,res,next) {
         try {
             const {user_id} = req.query
             if(!user_id) {
                 return next(ApiError.badRequest())
             }
-            const user_info = await userInfoService.findById(user_id)
+            const user_info = await userInfoService.findByUserId(user_id)
 
             return res.json(user_info)
         } catch (e) {
