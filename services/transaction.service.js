@@ -130,7 +130,7 @@ class transactionService{
         }
     }
 
-    async createWithdrawRequest(user_id, usdt_count, exe_price){
+    async createWithdrawRequest(user_id, usdt_count, exe_price, binance_id){
         try{
            const user = await User.findById(user_id)
             if(user===null){
@@ -143,7 +143,7 @@ class transactionService{
                 throw ApiError.preconditionFailed("insufficient funds")
             }
 
-            const transaction = await this.create(user_id, exe_price, 0, usdt_count, "withdraw", "in progress")
+            const transaction = await Transaction.create({binance_id, user_id, exe_price, exe_count: 0, usdt_count, kind: "withdraw", status: "in progress"})
 
             return transaction
         }catch (e) {

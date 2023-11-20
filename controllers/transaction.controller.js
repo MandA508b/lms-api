@@ -18,13 +18,13 @@ class transactionController{
 
     async createWithdrawRequest(req,res,next) {
         try {
-            let {user_id, usdt_count} = req.body
+            let {user_id, usdt_count, binance_id} = req.body
 
-            if (!user_id || !usdt_count) {
+            if (!user_id || !usdt_count || !binance_id) {
                 return next(ApiError.badRequest('missing user_id or usdt_count'))
             }
             const exe_price = await exeService.getPrice()
-            const transaction = await transactionService.createWithdrawRequest(user_id, usdt_count, exe_price)
+            const transaction = await transactionService.createWithdrawRequest(user_id, usdt_count, exe_price, binance_id)
 
             return res.json(transaction)
         } catch (e) {
