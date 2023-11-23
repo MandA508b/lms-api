@@ -166,17 +166,21 @@ class transactionService{
                         usdt_count: 0
                     }
                     for (let u_t_key in user_transaction){
+                        try{
+                            user_balance.exe_count += user_transaction[u_t_key].exe_count
+                            user_balance.usdt_count += user_transaction[u_t_key].usdt_count
 
-                        user_balance.exe_count += user_transaction[u_t_key].exe_count
-                        user_balance.usdt_count += user_transaction[u_t_key].usdt_count
+                            if(user_transaction[u_t_key].kind==='payout' || user_transaction[u_t_key].kind==='buy course'){
+                                const course_registration = await Course_registration.findOne({user_id: transactions[key].user_id, created_at: user_transaction[u_t_key].created_at})
+                                console.log({user_id: transactions[key].user_id, created_at: user_transaction[u_t_key].created_at})
+                                const course_iteration = await Course_iteration.findById(course_registration.course_iteration_id)
+                                const course = await Course.findById(course_iteration.course_id)
+                                user_history.push({transaction: user_transaction[u_t_key], course_name: course.name, balance: user_balance})
+                            }else{
+                                user_history.push({transaction: user_transaction[u_t_key], balance: user_balance})
+                            }
+                        }catch (e){
 
-                        if(user_transaction[u_t_key].kind==='payout' || user_transaction[u_t_key].kind==='buy course'){
-                            const course_registration = await Course_registration.findOne({user_id: transactions[key].user_id, created_at: user_transaction[u_t_key].created_at})
-                            const course_iteration = await Course_iteration.findById(course_registration.course_iteration_id)
-                            const course = await Course.findById(course_iteration.course_id)
-                            user_history.push({transaction: user_transaction[u_t_key], course_name: course.name, balance: user_balance})
-                        }else{
-                            user_history.push({transaction: user_transaction[u_t_key], balance: user_balance})
                         }
                     }
                     inprogress_transactions.push({user: user.email, role: user.role, transaction: transactions[key], user_history})
