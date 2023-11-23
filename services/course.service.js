@@ -348,8 +348,7 @@ class courseService{
                     const author_rating = await Author_rating.findOne({user_id: course.user_id})
                     let author_info = await User_info.findOne({user_id: course.user_id})
                     delete author_info.phone_number
-                    const lessons_info = await lessonService.findAllByCourse(courses[key]._id)
-
+                    const lessons_info = await lessonService.findAllByCourse(user_iterations[key]._id)
                     const course_theme = await CourseTheme.findById(course.course_theme_id)
                     const language = await Language.findById(course.language_id)
                     const course_iteration = await Course_iteration.findById(user_iterations[key].course_iteration_id)
@@ -374,7 +373,7 @@ class courseService{
                         language
                     })
                 }catch (e) {
-                    
+                    console.log(e)
                 }
             }
 

@@ -18,7 +18,7 @@ router.get('/findAll', courseController.findAll)
 router.get('/findByAuthor', auth_middleware, courseController.findByAuthor)
 router.get('/findById', courseController.findById)
 router.get('/coursesStatistics', courseController.coursesStatistics)
-router.get('/findUserCourses', student_middleware, auth_middleware, courseController.findUserCourses)
+router.get('/findUserCourses', courseController.findUserCourses)
 router.delete('/delete', author_middleware, auth_middleware, courseController.delete)//todo: delete image
 // todo: add update image
 
