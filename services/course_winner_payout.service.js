@@ -28,7 +28,7 @@ class courseWinnerPayoutsService{
 
                 }
 
-                Course_iteration_winner.deleteMany({course_iteration_id: course_iteration._id})
+                await Course_iteration_winner.deleteMany({course_iteration_id: course_iteration._id})
             }
         }catch (e) {
             console.log("error: ", e)
