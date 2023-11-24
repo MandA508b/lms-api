@@ -9,6 +9,6 @@ const student_middleware = require('../middlewares/student.middleware')
 router.post('/declinedWithdrawRequests', admin_middleware, auth_middleware, transactionController.declinedWithdrawRequests)
 router.post('/acceptWithdrawRequests', admin_middleware, auth_middleware, transactionController.acceptWithdrawRequests)
 router.post('/createWithdrawRequest', auth_middleware, transactionController.createWithdrawRequest)
-router.get('/findWithdrawRequests', admin_middleware, auth_middleware, transactionController.findWithdrawRequests)
+router.get('/findWithdrawRequests', transactionController.findWithdrawRequests)
 
 module.exports = router

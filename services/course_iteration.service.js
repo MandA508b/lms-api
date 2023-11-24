@@ -20,14 +20,17 @@ class courseIterationService{
                     const finish_at_next = finish_at + courses[key].duration * 86400000
 
                     const candidate_course_iteration = await Course_iteration.find({course_id: courses[key]._id , finish_at: {$gt: start_at} })
+
+                    // calculating course winners for exist iterations
+                    await courseWinnerPayoutService.calcPayoutsForCourseIteration(courses[key])
+
                     if(candidate_course_iteration.length>1 || courses[key].is_published ===false)continue;
                     if(candidate_course_iteration.length===0){
                         const course_iteration = await Course_iteration.create({course_id: courses[key]._id, start_at, finish_at})
                     }
                     const next_course_iteration = await Course_iteration.create({course_id: courses[key]._id, start_at: finish_at, finish_at: finish_at_next})
 
-                    // calculating course winners for exist iterations
-                    await courseWinnerPayoutService.calcPayoutsForCourseIteration(courses[key])
+
                 }catch(e){
                     courses[key].is_published=false
                     courses[key].save()

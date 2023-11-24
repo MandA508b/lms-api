@@ -139,7 +139,7 @@ class transactionService{
 
             const user_balance = await this.countUserWallet(user_id)
 
-            if(usdt_count<user_balance.usdt){
+            if(usdt_count>user_balance.usdt){
                 throw ApiError.preconditionFailed("insufficient funds")
             }
 

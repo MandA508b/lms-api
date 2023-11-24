@@ -11,6 +11,7 @@ class courseWinnerPayoutsService{
             let date = new Date().getTime()
             date = date - date % 86400000 - 43200000
             const course_iteration = await Course_iteration.findOne({course_id: course._id, finish_at: {$gte: date} , start_at: {$lte: date} })
+            console.log({course_iteration, name: course.name})
             if(course_iteration!==null) {
                 const course_iteration_winners = await Course_iteration_winner.find({course_iteration_id: course_iteration._id})
                 const exe_price = await exeService.getPrice()
@@ -21,6 +22,7 @@ class courseWinnerPayoutsService{
                         const course_winner_payout = await Course_winner_payout.create({usdt, exe, user_id: course_iteration_winners[key].user_id , course_id: course._id, course_iteration_id: course_iteration._id})
                         const transaction = await Transaction.create({user_id: course_iteration_winners[key].user_id, exe_price, exe_count: exe, usdt_count: usdt, kind: "payout", status: "completed"})
                     }catch (e) {
+                        console.log("calcPayoutsForCourseIteration error: ", e)
                     }
 
 
