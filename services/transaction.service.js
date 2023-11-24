@@ -172,7 +172,6 @@ class transactionService{
 
                             if(user_transaction[u_t_key].kind==='payout' || user_transaction[u_t_key].kind==='buy course'){
                                 const course_registration = await Course_registration.findOne({user_id: transactions[key].user_id, created_at: user_transaction[u_t_key].created_at})
-                                console.log({user_id: transactions[key].user_id, created_at: user_transaction[u_t_key].created_at})
                                 const course_iteration = await Course_iteration.findById(course_registration.course_iteration_id)
                                 const course = await Course.findById(course_iteration.course_id)
                                 user_history.push({transaction: user_transaction[u_t_key], course_name: course.name, balance: user_balance})
@@ -180,7 +179,7 @@ class transactionService{
                                 user_history.push({transaction: user_transaction[u_t_key], balance: user_balance})
                             }
                         }catch (e){
-
+                            console.log(e)
                         }
                     }
                     inprogress_transactions.push({user: user.email, role: user.role, transaction: transactions[key], user_history})
