@@ -32,13 +32,15 @@ class lessonController{
             console.log(' test video lesson.controller error', JSON.stringify({...e}, null, 4))
             next(e)
         }
-    }
+    }//todo
 
     async create(req,res,next) {
         try {
             const {course_id, name, description, duration} = req.body
 
             const video = req.file
+            console.log(video)
+            return 0
             if(course_id===undefined || name===undefined || description===undefined || video === undefined || duration===undefined) {
                 return next(ApiError.badRequest())
             }

@@ -1,4 +1,9 @@
-const AWS = require("aws-sdk");
+const {S3Client}  = require("@aws-sdk/client-s3");
+const {Upload}   = require("@aws-sdk/lib-storage");
+const { SESClient } = require ("@aws-sdk/client-ses");
+const { PassThrough } = require('stream');
+const fs = require('fs')
+
 const ApiError = require(`../errors/api.error`)
 
 class s3Service{

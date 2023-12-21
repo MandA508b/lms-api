@@ -45,7 +45,7 @@ class lessonService{
     async create(course_id, name, description, video, duration) {
         try{
             let video_name = crypto.randomBytes(30).toString('hex') + '.mp4'
-            await s3Service.upload(video, video_name, "video")
+            // await s3Service.upload(video, video_name, "video")
             video_name = process.env.CDN_URL + 'video/' + video_name
 
             const course = await Course.findById(course_id)
