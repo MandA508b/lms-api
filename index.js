@@ -44,10 +44,9 @@ let CronJob = require("cron").CronJob,
     "0 0 */1 * *",
     async function () {
       // function to add course iterations
-        console.log("createIterations start")
+      console.log("createIterations start");
       await courseIterationService.createIterationsMonthly();
-        console.log("createIterations end")
-
+      console.log("createIterations end");
     },
     null,
     true
